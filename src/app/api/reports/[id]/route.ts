@@ -9,7 +9,7 @@ import {
   forbiddenResponse,
   notFoundResponse,
 } from "@/lib/api-response";
-import { ModerationActionType, ReportStatus, ListingStatus, UserStatus } from "@prisma/client";
+import { ModerationActionType, ReportStatus, ListingStatus, UserStatus } from "@/types/enums";
 
 export async function PATCH(
   req: NextRequest,

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { updateListingStatusSchema } from "@/lib/validations/listing";
 import { updateExchangeStatusSchema, moderationActionSchema } from "@/lib/validations/interaction";
-import { ListingStatus, ExchangeStatus, ModerationActionType, Role } from "@prisma/client";
+import { ListingStatus, ExchangeStatus, ModerationActionType, Role } from "@/types/enums";
 
 describe("Business Logic & State Machine Unit Tests", () => {
   describe("Listing State Transitions", () => {

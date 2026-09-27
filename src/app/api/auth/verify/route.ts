@@ -4,6 +4,7 @@ import { verifyEmailSchema } from "@/lib/validations/auth";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import { getSession, signToken, AUTH_COOKIE_NAME } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { Role } from "@/types/enums";
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       const newToken = await signToken({
         id: updatedUser.id,
         email: updatedUser.email,
-        role: updatedUser.role,
+        role: updatedUser.role as Role,
         fullName: user.profile?.fullName || "Student",
         isEmailVerified: true,
       });

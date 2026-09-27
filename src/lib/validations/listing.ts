@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ItemCondition, TransactionType, ListingStatus } from "@prisma/client";
+import { ItemCondition, TransactionType, ListingStatus } from "@/types/enums";
 
 export const listingSchema = z.object({
   title: z

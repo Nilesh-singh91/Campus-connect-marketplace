@@ -3,7 +3,7 @@ import { registerSchema, loginSchema } from "@/lib/validations/auth";
 import { listingSchema } from "@/lib/validations/listing";
 import { exchangeRequestSchema, reportSchema } from "@/lib/validations/interaction";
 import { hashPassword, comparePassword, signToken, verifyToken } from "@/lib/auth";
-import { ItemCondition, TransactionType, Role, ReportTargetType } from "@prisma/client";
+import { ItemCondition, TransactionType, Role, ReportTargetType } from "@/types/enums";
 
 describe("Foundation Unit Tests", () => {
   describe("Authentication Validations & College Domain Verification", () => {

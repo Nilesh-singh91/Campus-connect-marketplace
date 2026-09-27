@@ -5,7 +5,7 @@ import { registerSchema } from "@/lib/validations/auth";
 import { hashPassword, signToken, AUTH_COOKIE_NAME } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/api-response";
 import crypto from "crypto";
-import { Role } from "@prisma/client";
+import { Role } from "@/types/enums";
 
 export async function POST(req: NextRequest) {
   try {
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     const token = await signToken({
       id: newUser.id,
       email: newUser.email,
-      role: newUser.role,
+      role: newUser.role as Role,
       fullName: newUser.profile?.fullName || fullName,
       isEmailVerified: newUser.isEmailVerified,
     });

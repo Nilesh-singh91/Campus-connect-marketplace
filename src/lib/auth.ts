@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { Role } from "@prisma/client";
+import { Role } from "@/types/enums";
 
 const JWT_SECRET = process.env.JWT_SECRET || "campusconnect-super-secure-jwt-secret-key-change-in-production-min32chars";
 const secretKey = new TextEncoder().encode(JWT_SECRET);

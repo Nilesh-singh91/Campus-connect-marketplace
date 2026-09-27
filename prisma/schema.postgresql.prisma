@@ -3,8 +3,75 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  MODERATOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum ItemCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+}
+
+enum TransactionType {
+  SELL
+  EXCHANGE
+  BOTH
+}
+
+enum ListingStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  REMOVED
+}
+
+enum ExchangeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum ReportTargetType {
+  LISTING
+  USER
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+enum ModerationActionType {
+  WARN_USER
+  SUSPEND_USER
+  BAN_USER
+  REMOVE_LISTING
+  DISMISS_REPORT
+}
+
+enum NotificationType {
+  MESSAGE
+  EXCHANGE_REQUEST
+  LISTING_UPDATE
+  REPORT_STATUS
+  SYSTEM
 }
 
 model CollegeDomain {
@@ -23,10 +90,10 @@ model User {
   id              String     @id @default(uuid())
   email           String     @unique
   passwordHash    String
-  role            String     @default("STUDENT")
+  role            Role       @default(STUDENT)
   isEmailVerified Boolean    @default(false)
   verificationToken String?
-  status          String     @default("ACTIVE")
+  status          UserStatus @default(ACTIVE)
   collegeDomainId String?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -87,10 +154,10 @@ model Listing {
   id              String          @id @default(uuid())
   title           String
   description     String
-  price           Float           @default(0.0)
-  condition       String          @default("GOOD")
-  transactionType String          @default("SELL")
-  status          String          @default("AVAILABLE")
+  price           Decimal         @default(0.00) @db.Decimal(10, 2)
+  condition       ItemCondition   @default(GOOD)
+  transactionType TransactionType @default(SELL)
+  status          ListingStatus   @default(AVAILABLE)
   views           Int             @default(0)
   userId          String
   categoryId      String
@@ -196,8 +263,8 @@ model ExchangeRequest {
   offeredListingId String?
   buyerId          String
   sellerId         String
-  cashDifference   Float          @default(0.0)
-  status           String         @default("PENDING")
+  cashDifference   Decimal        @default(0.00) @db.Decimal(10, 2)
+  status           ExchangeStatus @default(PENDING)
   message          String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
@@ -217,12 +284,12 @@ model ExchangeRequest {
 model Report {
   id              String           @id @default(uuid())
   reporterId      String
-  targetType      String
+  targetType      ReportTargetType
   targetListingId String?
   targetUserId    String?
   reason          String
   details         String?
-  status          String           @default("PENDING")
+  status          ReportStatus     @default(PENDING)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -242,7 +309,7 @@ model ModerationAction {
   id            String               @id @default(uuid())
   reportId      String?
   moderatorId   String
-  actionType    String
+  actionType    ModerationActionType
   internalNotes String?
   createdAt     DateTime             @default(now())
 
@@ -257,7 +324,7 @@ model ModerationAction {
 model Notification {
   id        String           @id @default(uuid())
   userId    String
-  type      String
+  type      NotificationType
   title     String
   content   String
   link      String?

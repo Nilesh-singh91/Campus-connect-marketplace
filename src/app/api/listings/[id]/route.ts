@@ -9,7 +9,7 @@ import {
   forbiddenResponse,
   notFoundResponse,
 } from "@/lib/api-response";
-import { ListingStatus } from "@prisma/client";
+import { ListingStatus } from "@/types/enums";
 
 export async function GET(
   req: NextRequest,

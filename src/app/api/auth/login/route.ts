@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { loginSchema } from "@/lib/validations/auth";
 import { comparePassword, signToken, AUTH_COOKIE_NAME } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { Role } from "@/types/enums";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     const token = await signToken({
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as Role,
       fullName: user.profile?.fullName || "Student",
       isEmailVerified: user.isEmailVerified,
     });

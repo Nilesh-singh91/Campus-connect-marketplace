@@ -32,8 +32,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
   if (params.query) {
     where.OR = [
-      { title: { contains: params.query, mode: "insensitive" } },
-      { description: { contains: params.query, mode: "insensitive" } },
+      { title: { contains: params.query } },
+      { description: { contains: params.query } },
     ];
   }
 

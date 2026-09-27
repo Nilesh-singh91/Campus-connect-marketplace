@@ -8,7 +8,7 @@ import {
   forbiddenResponse,
   notFoundResponse,
 } from "@/lib/api-response";
-import { UserStatus, Role } from "@prisma/client";
+import { UserStatus, Role } from "@/types/enums";
 
 export async function PATCH(
   req: NextRequest,

@@ -9,7 +9,7 @@ import {
   forbiddenResponse,
   notFoundResponse,
 } from "@/lib/api-response";
-import { ExchangeStatus, ListingStatus } from "@prisma/client";
+import { ExchangeStatus, ListingStatus } from "@/types/enums";
 
 export async function PATCH(
   req: NextRequest,

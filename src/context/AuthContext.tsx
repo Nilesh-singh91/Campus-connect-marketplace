@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { Role } from "@prisma/client";
+import { Role } from "@/types/enums";
 
 export interface CurrentUser {
   id: string;

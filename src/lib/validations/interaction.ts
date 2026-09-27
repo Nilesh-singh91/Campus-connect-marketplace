@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ReportTargetType, ModerationActionType, ExchangeStatus } from "@prisma/client";
+import { ReportTargetType, ModerationActionType, ExchangeStatus } from "@/types/enums";
 
 export const exchangeRequestSchema = z.object({
   targetListingId: z.string().uuid("Invalid target listing ID"),

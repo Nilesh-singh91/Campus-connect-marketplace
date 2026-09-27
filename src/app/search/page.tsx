@@ -21,8 +21,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       where: {
         status: "AVAILABLE",
         OR: [
-          { title: { contains: query, mode: "insensitive" } },
-          { description: { contains: query, mode: "insensitive" } },
+          { title: { contains: query } },
+          { description: { contains: query } },
         ],
       },
       orderBy: { createdAt: "desc" },
