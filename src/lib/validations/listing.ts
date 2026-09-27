@@ -24,7 +24,12 @@ export const listingSchema = z.object({
   }),
   categoryId: z.string().uuid("Please select a valid category"),
   images: z
-    .array(z.string().url("Image URL must be valid"))
+    .array(
+      z.string().refine(
+        (val) => val.startsWith("/") || val.startsWith("http://") || val.startsWith("https://") || val.startsWith("data:image/"),
+        "Image must be a valid uploaded file or URL"
+      )
+    )
     .min(1, "At least one product image is required")
     .max(6, "Maximum 6 images allowed per listing"),
 });

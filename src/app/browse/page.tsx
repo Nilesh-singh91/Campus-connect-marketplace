@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import { FilterSidebar } from "@/components/marketplace/FilterSidebar";
+import { SortSelect } from "@/components/marketplace/SortSelect";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, PackageOpen, GraduationCap, ShieldCheck } from "lucide-react";
@@ -133,20 +134,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           </div>
 
           {/* Sort Select */}
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-zinc-500 text-xs font-medium">Sort by:</span>
-            <select
-              defaultValue={params.sort || "newest"}
-              onChange={(e) => {
-                window.location.href = buildUrlWithParam({ sort: e.target.value, page: 1 });
-              }}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="newest">Recently Listed</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-            </select>
-          </div>
+          <SortSelect currentSort={params.sort || "newest"} />
         </div>
 
         {/* Multi-College Campus Quick Tabs */}

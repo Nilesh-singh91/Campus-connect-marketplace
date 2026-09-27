@@ -144,5 +144,40 @@ describe("Business Logic & State Machine Unit Tests", () => {
       expect(queryAll.success).toBe(true);
       expect(queryAll.data?.college).toBe("all");
     });
+
+    it("should accept both local uploaded image paths (/uploads/...) and remote URLs (https://...) in listingSchema", async () => {
+      const { listingSchema } = await import("@/lib/validations/listing");
+      const { ItemCondition, TransactionType } = await import("@/types/enums");
+
+      const baseListing = {
+        title: "Engineering Mechanics Textbook",
+        description: "Standard university textbook for 1st year students. Good condition with notes.",
+        price: 450,
+        condition: ItemCondition.GOOD,
+        transactionType: TransactionType.SELL,
+        categoryId: "e9f73a20-be43-4a5b-b9ca-8e3de221b2b2",
+      };
+
+      // Local uploaded image path
+      const localImageListing = listingSchema.safeParse({
+        ...baseListing,
+        images: ["/uploads/listings/listing-1790501033800-4b2a.png"],
+      });
+      expect(localImageListing.success).toBe(true);
+
+      // Remote HTTPS image URL
+      const remoteImageListing = listingSchema.safeParse({
+        ...baseListing,
+        images: ["https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c"],
+      });
+      expect(remoteImageListing.success).toBe(true);
+
+      // Empty images array should fail
+      const emptyImagesListing = listingSchema.safeParse({
+        ...baseListing,
+        images: [],
+      });
+      expect(emptyImagesListing.success).toBe(false);
+    });
   });
 });

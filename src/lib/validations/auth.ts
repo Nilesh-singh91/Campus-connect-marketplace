@@ -69,7 +69,10 @@ export const updateProfileSchema = z.object({
   yearOfStudy: z.coerce.number().int().min(1).max(5).optional(),
   phone: z.string().max(20).optional().nullable(),
   bio: z.string().max(500).optional().nullable(),
-  avatarUrl: z.string().url().optional().nullable().or(z.literal("")),
+  avatarUrl: z.string().refine(
+    (val) => !val || val.startsWith("/") || val.startsWith("http://") || val.startsWith("https://"),
+    "Invalid avatar image path"
+  ).optional().nullable().or(z.literal("")),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

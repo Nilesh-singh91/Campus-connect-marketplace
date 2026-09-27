@@ -127,7 +127,19 @@ export default function CreateListingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        setServerError(json.error || "Failed to create listing");
+        if (json.details && typeof json.details === "object") {
+          const fieldErrs: Record<string, string> = {};
+          const errMsgs: string[] = [];
+          for (const [k, v] of Object.entries(json.details)) {
+            const msg = Array.isArray(v) ? v.join(", ") : String(v);
+            fieldErrs[k] = msg;
+            errMsgs.push(msg);
+          }
+          setErrors(fieldErrs);
+          setServerError(errMsgs.length > 0 ? errMsgs.join(". ") : (json.error || "Validation error"));
+        } else {
+          setServerError(json.error || "Failed to create listing");
+        }
         return;
       }
 
