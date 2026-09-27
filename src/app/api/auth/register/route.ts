@@ -36,7 +36,12 @@ export async function POST(req: NextRequest) {
     if (!collegeDomain) {
       let collegeName = `${emailDomain.split(".")[0].toUpperCase()} Campus`;
       if (emailDomain === "liet.in") collegeName = "Lloyd Institute of Engineering & Technology (LIET)";
-      if (emailDomain === "aktu.in") collegeName = "Dr. A.P.J. Abdul Kalam Technical University (AKTU)";
+      else if (emailDomain === "glbitm.ac.in") collegeName = "GL Bajaj Institute of Technology & Management (GLBITM)";
+      else if (emailDomain === "gniot.net.in") collegeName = "Greater Noida Institute of Technology (GNIOT)";
+      else if (emailDomain === "galgotiascollege.edu") collegeName = "Galgotias College of Engineering & Technology (GCET)";
+      else if (emailDomain === "sharda.ac.in") collegeName = "Sharda University, Greater Noida";
+      else if (emailDomain === "bennett.edu.in") collegeName = "Bennett University, Greater Noida";
+      else if (emailDomain === "aktu.in") collegeName = "Dr. A.P.J. Abdul Kalam Technical University (AKTU)";
 
       collegeDomain = await db.collegeDomain.create({
         data: {

@@ -97,6 +97,13 @@ describe("Business Logic & State Machine Unit Tests", () => {
       // State Engineering / Academic .ac.in
       expect(registerSchema.safeParse({ ...basePayload, email: "rahul@lit.ac.in" }).success).toBe(true);
 
+      // Greater Noida College Cluster (Knowledge Park)
+      expect(registerSchema.safeParse({ ...basePayload, email: "rahul@gniot.net.in" }).success).toBe(true);
+      expect(registerSchema.safeParse({ ...basePayload, email: "karan@glbitm.ac.in" }).success).toBe(true);
+      expect(registerSchema.safeParse({ ...basePayload, email: "ananya@galgotiascollege.edu" }).success).toBe(true);
+      expect(registerSchema.safeParse({ ...basePayload, email: "tanya@sharda.ac.in" }).success).toBe(true);
+      expect(registerSchema.safeParse({ ...basePayload, email: "arjun@bennett.edu.in" }).success).toBe(true);
+
       // Public / Commercial emails must be rejected
       expect(registerSchema.safeParse({ ...basePayload, email: "hacker@gmail.com" }).success).toBe(false);
       expect(registerSchema.safeParse({ ...basePayload, email: "spammer@yahoo.com" }).success).toBe(false);
