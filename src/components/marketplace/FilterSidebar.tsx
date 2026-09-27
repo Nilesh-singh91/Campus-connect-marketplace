@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, GraduationCap } from "lucide-react";
 
 interface CategoryOption {
   id: string;
@@ -12,15 +12,25 @@ interface CategoryOption {
   _count?: { listings: number };
 }
 
-interface FilterSidebarProps {
-  categories: CategoryOption[];
+export interface CollegeOption {
+  id: string;
+  domain: string;
+  collegeName: string;
+  _count?: { listings: number };
 }
 
-export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories }) => {
+interface FilterSidebarProps {
+  categories: CategoryOption[];
+  colleges?: CollegeOption[];
+  userCollegeId?: string | null;
+}
+
+export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, colleges = [], userCollegeId }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const currentCategory = searchParams.get("category") || "";
+  const currentCollege = searchParams.get("college") || "";
   const currentCondition = searchParams.get("condition") || "";
   const currentType = searchParams.get("type") || "";
   const currentSort = searchParams.get("sort") || "newest";
@@ -73,7 +83,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories }) => {
     { label: "Sell or Exchange", value: "BOTH" },
   ];
 
-  const hasActiveFilters = !!(currentCategory || currentCondition || currentType || minPrice || maxPrice);
+  const hasActiveFilters = !!(currentCategory || currentCollege || currentCondition || currentType || minPrice || maxPrice);
 
   return (
     <div className="bg-white rounded-2xl border border-zinc-200 p-5 space-y-6 shadow-xs">
@@ -88,6 +98,47 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories }) => {
           </button>
         )}
       </div>
+
+      {/* College Campus Filter */}
+      {colleges.length > 0 && (
+        <div className="pb-4 border-b border-zinc-100">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2.5 flex items-center gap-1.5">
+            <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+            College Campus
+          </h4>
+          <div className="space-y-1">
+            <button
+              onClick={() => updateFilter("college", "all")}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer flex justify-between items-center ${
+                currentCollege === "all" ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              <span>🌐 All Campuses</span>
+            </button>
+            {colleges.map((col) => {
+              const isSelected = currentCollege === col.id || currentCollege === col.domain || (!currentCollege && userCollegeId === col.id);
+              const isMyCollege = userCollegeId === col.id;
+              return (
+                <button
+                  key={col.id}
+                  onClick={() => updateFilter("college", col.domain)}
+                  className={`w-full text-left px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer flex justify-between items-center ${
+                    isSelected ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+                  }`}
+                >
+                  <span className="truncate max-w-[140px]" title={col.collegeName}>
+                    {col.collegeName.split("(")[0].trim()}
+                    {isMyCollege && <span className="ml-1 text-[10px] text-emerald-600 font-bold">(Mine)</span>}
+                  </span>
+                  {col._count?.listings !== undefined && (
+                    <span className="text-[11px] text-zinc-400 ml-1 font-normal">{col._count.listings}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Category List */}
       <div>

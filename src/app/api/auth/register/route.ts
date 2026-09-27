@@ -34,10 +34,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (!collegeDomain) {
+      let collegeName = `${emailDomain.split(".")[0].toUpperCase()} Campus`;
+      if (emailDomain === "liet.in") collegeName = "Lloyd Institute of Engineering & Technology (LIET)";
+      if (emailDomain === "aktu.in") collegeName = "Dr. A.P.J. Abdul Kalam Technical University (AKTU)";
+
       collegeDomain = await db.collegeDomain.create({
         data: {
           domain: emailDomain,
-          collegeName: `${emailDomain.split(".")[0].toUpperCase()} Campus`,
+          collegeName,
           isActive: true,
         },
       });
@@ -69,6 +73,7 @@ export async function POST(req: NextRequest) {
         },
         include: {
           profile: true,
+          collegeDomain: true,
         },
       });
 
@@ -78,7 +83,7 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           type: "SYSTEM",
           title: "Welcome to CampusConnect!",
-          content: `Hi ${fullName}, welcome to your official student peer-to-peer marketplace. Start browsing items or list your used books and gear.`,
+          content: `Hi ${fullName}, welcome to your official ${collegeDomain.collegeName} marketplace. Start browsing items or list your used books and gear for your campus peers.`,
           link: "/browse",
         },
       });
@@ -93,6 +98,8 @@ export async function POST(req: NextRequest) {
       role: newUser.role as Role,
       fullName: newUser.profile?.fullName || fullName,
       isEmailVerified: newUser.isEmailVerified,
+      collegeDomainId: collegeDomain.id,
+      collegeName: collegeDomain.collegeName,
     });
 
     // Set HTTP-only Cookie
@@ -113,8 +120,10 @@ export async function POST(req: NextRequest) {
           role: newUser.role,
           isEmailVerified: newUser.isEmailVerified,
           fullName: newUser.profile?.fullName,
+          collegeDomainId: collegeDomain.id,
+          collegeName: collegeDomain.collegeName,
         },
-        verificationCode: verificationToken, // Provided for instant demo/testing verification
+        verificationCode: verificationToken,
       },
       "Registration successful! Your college account has been created.",
       201

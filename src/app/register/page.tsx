@@ -115,7 +115,7 @@ export default function RegisterPage() {
             Join your college peer marketplace. Please register using your official university or institute email ID.
           </p>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
-            <ShieldCheck className="w-4 h-4" /> Allowed domains: .edu, .ac.in, or affiliated college domains
+            <ShieldCheck className="w-4 h-4" /> Supported: @liet.in (Lloyd), @aktu.in (AKTU), .edu, .ac.in
           </div>
         </div>
 
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             <Input
               label="Full Name"
               name="fullName"
-              placeholder="e.g. Aarav Sharma"
+              placeholder="e.g. Aman Verma"
               value={formData.fullName}
               onChange={handleChange}
               error={errors.fullName}
@@ -144,11 +144,11 @@ export default function RegisterPage() {
               label="College Email Address"
               name="email"
               type="email"
-              placeholder="student@college.edu or @lit.ac.in"
+              placeholder="student@liet.in or @aktu.in"
               value={formData.email}
               onChange={handleChange}
               error={errors.email}
-              helperText="Must end in .edu or .ac.in"
+              helperText="e.g. @liet.in (Lloyd), @aktu.in (AKTU), .edu, or .ac.in"
               required
             />
           </div>

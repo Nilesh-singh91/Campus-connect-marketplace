@@ -65,11 +65,33 @@ export async function POST(req: NextRequest) {
 
     const targetListing = await db.listing.findUnique({
       where: { id: targetListingId },
-      include: { user: true },
+      include: {
+        collegeDomain: true,
+        user: { include: { collegeDomain: true } },
+      },
     });
 
     if (!targetListing) {
       return errorResponse("Target listing not found", 404);
+    }
+
+    // Verify campus isolation: only students from the same college can propose exchanges
+    const currentUser = await db.user.findUnique({
+      where: { id: session.id },
+      include: { collegeDomain: true },
+    });
+
+    const targetCampusId = targetListing.collegeDomainId || targetListing.user.collegeDomainId;
+    if (
+      currentUser?.collegeDomainId &&
+      targetCampusId &&
+      currentUser.collegeDomainId !== targetCampusId
+    ) {
+      const targetCollege = targetListing.collegeDomain?.collegeName || targetListing.user.collegeDomain?.collegeName || "another college";
+      const userCollege = currentUser.collegeDomain?.collegeName || "your college";
+      return forbiddenResponse(
+        `Campus Restriction: Exchange proposals are restricted to students within the same college campus. You (${userCollege}) cannot trade with ${targetCollege}.`
+      );
     }
 
     if (targetListing.userId === session.id) {

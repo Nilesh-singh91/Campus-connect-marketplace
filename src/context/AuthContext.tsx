@@ -12,6 +12,8 @@ export interface CurrentUser {
   avatarUrl?: string | null;
   branch?: string | null;
   yearOfStudy?: number | null;
+  collegeDomainId?: string | null;
+  collegeName?: string | null;
 }
 
 interface AuthContextType {

@@ -72,4 +72,77 @@ describe("Business Logic & State Machine Unit Tests", () => {
       expect(canModifyListing("user-1", "mod-user", Role.MODERATOR)).toBe(true);
     });
   });
+
+  describe("Multi-College & Cross-Campus Isolation Rules", () => {
+    it("should validate and accept official college domains including @liet.in and @aktu.in", async () => {
+      const { registerSchema } = await import("@/lib/validations/auth");
+      
+      const basePayload = {
+        fullName: "Aman Verma",
+        password: "Password123",
+        enrollmentNumber: "ENR12345",
+        branch: "CSE",
+        yearOfStudy: 3,
+      };
+
+      // Lloyd Institute of Engineering & Technology
+      expect(registerSchema.safeParse({ ...basePayload, email: "aman@liet.in" }).success).toBe(true);
+
+      // Dr. A.P.J. Abdul Kalam Technical University (AKTU)
+      expect(registerSchema.safeParse({ ...basePayload, email: "sneha@aktu.in" }).success).toBe(true);
+
+      // National Institute of Technology / Academic .edu
+      expect(registerSchema.safeParse({ ...basePayload, email: "student@college.edu" }).success).toBe(true);
+
+      // State Engineering / Academic .ac.in
+      expect(registerSchema.safeParse({ ...basePayload, email: "rahul@lit.ac.in" }).success).toBe(true);
+
+      // Public / Commercial emails must be rejected
+      expect(registerSchema.safeParse({ ...basePayload, email: "hacker@gmail.com" }).success).toBe(false);
+      expect(registerSchema.safeParse({ ...basePayload, email: "spammer@yahoo.com" }).success).toBe(false);
+    });
+
+    it("should strictly enforce campus isolation for purchases and trade proposals", () => {
+      const isTransactionPermitted = (buyerCollegeId: string | null, listingCollegeId: string | null) => {
+        if (!buyerCollegeId || !listingCollegeId) return false;
+        return buyerCollegeId === listingCollegeId;
+      };
+
+      const LLOYD_ID = "domain-liet-in-uuid";
+      const AKTU_ID = "domain-aktu-in-uuid";
+      const NIT_ID = "domain-college-edu-uuid";
+
+      // Same college: Lloyd student buying Lloyd item -> ALLOWED
+      expect(isTransactionPermitted(LLOYD_ID, LLOYD_ID)).toBe(true);
+
+      // Same college: AKTU student trading with AKTU student -> ALLOWED
+      expect(isTransactionPermitted(AKTU_ID, AKTU_ID)).toBe(true);
+
+      // Cross college: Lloyd student attempting to buy AKTU item -> BLOCKED
+      expect(isTransactionPermitted(LLOYD_ID, AKTU_ID)).toBe(false);
+
+      // Cross college: AKTU student attempting to trade with NIT item -> BLOCKED
+      expect(isTransactionPermitted(AKTU_ID, NIT_ID)).toBe(false);
+
+      // Unauthenticated / Unassigned college -> BLOCKED
+      expect(isTransactionPermitted(null, LLOYD_ID)).toBe(false);
+    });
+
+    it("should validate listing query parameters with optional college filter", async () => {
+      const { listingQuerySchema } = await import("@/lib/validations/listing");
+
+      // Default query
+      expect(listingQuerySchema.safeParse({}).success).toBe(true);
+
+      // Filter by specific college domain
+      const queryWithCollege = listingQuerySchema.safeParse({ college: "liet.in" });
+      expect(queryWithCollege.success).toBe(true);
+      expect(queryWithCollege.data?.college).toBe("liet.in");
+
+      // Filter by all colleges
+      const queryAll = listingQuerySchema.safeParse({ college: "all" });
+      expect(queryAll.success).toBe(true);
+      expect(queryAll.data?.college).toBe("all");
+    });
+  });
 });

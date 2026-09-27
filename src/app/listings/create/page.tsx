@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { PlusCircle, Upload, X, AlertCircle, ShieldAlert, Sparkles, Image as ImageIcon } from "lucide-react";
+import { PlusCircle, Upload, X, AlertCircle, ShieldAlert, Sparkles, Image as ImageIcon, GraduationCap } from "lucide-react";
 import Link from "next/link";
 
 export default function CreateListingPage() {
@@ -176,11 +176,19 @@ export default function CreateListingPage() {
   return (
     <div className="max-w-3xl mx-auto py-6">
       <div className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-10 shadow-xs space-y-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Post a Campus Listing</h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            Sell or trade your used textbooks, drafters, gadgets, and supplies directly to students
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-100 pb-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Post a Campus Listing</h1>
+            <p className="text-sm text-zinc-500 mt-1">
+              Sell or trade your used textbooks, drafters, gadgets, and supplies directly to students
+            </p>
+          </div>
+          {user.collegeName && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold self-start sm:self-auto">
+              <GraduationCap className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Campus: {user.collegeName.split("(")[0].trim()}</span>
+            </div>
+          )}
         </div>
 
         {serverError && (

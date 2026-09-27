@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       where: { email },
       include: {
         profile: true,
+        collegeDomain: true,
       },
     });
 
@@ -43,6 +44,8 @@ export async function POST(req: NextRequest) {
       role: user.role as Role,
       fullName: user.profile?.fullName || "Student",
       isEmailVerified: user.isEmailVerified,
+      collegeDomainId: user.collegeDomainId,
+      collegeName: user.collegeDomain?.collegeName,
     });
 
     const cookieStore = await cookies();
@@ -62,6 +65,8 @@ export async function POST(req: NextRequest) {
           role: user.role,
           isEmailVerified: user.isEmailVerified,
           fullName: user.profile?.fullName,
+          collegeDomainId: user.collegeDomainId,
+          collegeName: user.collegeDomain?.collegeName,
         },
       },
       "Logged in successfully"

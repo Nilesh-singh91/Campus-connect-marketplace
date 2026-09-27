@@ -40,6 +40,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
       include: {
         images: { orderBy: { displayOrder: "asc" } },
         category: true,
+        collegeDomain: true,
         user: {
           select: {
             id: true,
@@ -47,6 +48,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             role: true,
             isEmailVerified: true,
             createdAt: true,
+            collegeDomainId: true,
             collegeDomain: {
               select: { collegeName: true, domain: true },
             },
@@ -82,16 +84,22 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
     isFavorited = !!fav;
   }
 
-  // Related listings
+  // Related listings (scoped to same campus)
+  const relatedWhere: any = {
+    categoryId: listing.categoryId,
+    id: { not: listing.id },
+    status: "AVAILABLE",
+  };
+  if (listing.collegeDomainId) {
+    relatedWhere.collegeDomainId = listing.collegeDomainId;
+  }
+
   const relatedListings = await db.listing.findMany({
-    where: {
-      categoryId: listing.categoryId,
-      id: { not: listing.id },
-      status: "AVAILABLE",
-    },
+    where: relatedWhere,
     take: 4,
     include: {
       category: true,
+      collegeDomain: true,
       images: { take: 1 },
       user: {
         select: {
@@ -166,6 +174,10 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                     <Repeat className="w-3 h-3" /> Buy or Exchange
                   </Badge>
                 )}
+                <Badge variant="secondary" className="flex items-center gap-1 bg-indigo-50 text-indigo-700 border-indigo-200">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  {listing.collegeDomain?.collegeName?.split("(")[0]?.trim() || listing.user.collegeDomain?.collegeName?.split("(")[0]?.trim() || "Campus Verified"}
+                </Badge>
               </div>
 
               <span className="text-xs text-zinc-400 flex items-center gap-1">
@@ -208,6 +220,8 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               favoritesCount={listing._count.favorites}
               status={listing.status}
               title={listing.title}
+              sellerCollegeDomainId={listing.collegeDomainId || listing.user.collegeDomainId}
+              sellerCollegeName={listing.collegeDomain?.collegeName || listing.user.collegeDomain?.collegeName}
             />
 
             {/* Report Link */}
@@ -287,6 +301,8 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 categoryName={item.category.name}
                 sellerName={item.user.profile?.fullName}
                 sellerBranch={item.user.profile?.branch || undefined}
+                collegeDomainId={item.collegeDomainId}
+                collegeName={item.collegeDomain?.collegeName}
               />
             ))}
           </div>

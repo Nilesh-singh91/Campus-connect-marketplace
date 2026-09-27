@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
       return errorResponse("Invalid search parameters", 400, parsedQuery.error.flatten());
     }
 
+    const session = await getSession();
+
     const {
       query,
       category,
@@ -21,6 +23,7 @@ export async function GET(req: NextRequest) {
       transactionType,
       minPrice,
       maxPrice,
+      college,
       sort,
       page,
       limit,
@@ -29,6 +32,21 @@ export async function GET(req: NextRequest) {
     const where: Prisma.ListingWhereInput = {
       status: "AVAILABLE",
     };
+
+    // Campus-level filtering:
+    // If college param is specified:
+    // - "all": return listings from all colleges
+    // - specific ID or domain string: filter by that college domain
+    // If college param is NOT specified, default to the logged-in user's college
+    if (college) {
+      if (college !== "all") {
+        where.collegeDomain = {
+          OR: [{ id: college }, { domain: college }],
+        };
+      }
+    } else if (session?.collegeDomainId) {
+      where.collegeDomainId = session.collegeDomainId;
+    }
 
     if (query) {
       where.OR = [
@@ -76,7 +94,11 @@ export async function GET(req: NextRequest) {
           transactionType: true,
           status: true,
           views: true,
+          collegeDomainId: true,
           createdAt: true,
+          collegeDomain: {
+            select: { id: true, collegeName: true, domain: true },
+          },
           category: {
             select: { id: true, name: true, slug: true },
           },
@@ -89,6 +111,10 @@ export async function GET(req: NextRequest) {
             select: {
               id: true,
               role: true,
+              collegeDomainId: true,
+              collegeDomain: {
+                select: { id: true, collegeName: true, domain: true },
+              },
               profile: {
                 select: { fullName: true, branch: true, avatarUrl: true },
               },
@@ -126,7 +152,7 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.findUnique({
       where: { id: session.id },
-      select: { isEmailVerified: true, status: true },
+      select: { isEmailVerified: true, status: true, collegeDomainId: true },
     });
 
     if (!user || user.status !== "ACTIVE") {
@@ -162,6 +188,7 @@ export async function POST(req: NextRequest) {
         transactionType,
         categoryId,
         userId: session.id,
+        collegeDomainId: user.collegeDomainId || session.collegeDomainId || null,
         images: {
           create: images.map((url, index) => ({
             url,
@@ -172,6 +199,7 @@ export async function POST(req: NextRequest) {
       include: {
         images: true,
         category: true,
+        collegeDomain: true,
       },
     });
 

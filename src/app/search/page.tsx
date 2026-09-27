@@ -28,10 +28,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       orderBy: { createdAt: "desc" },
       include: {
         category: true,
+        collegeDomain: true,
         images: { take: 1 },
         user: {
           select: {
             id: true,
+            collegeDomainId: true,
+            collegeDomain: true,
             profile: { select: { fullName: true, branch: true } },
           },
         },
@@ -72,6 +75,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               categoryName={item.category.name}
               sellerName={item.user.profile?.fullName}
               sellerBranch={item.user.profile?.branch || undefined}
+              collegeDomainId={item.collegeDomainId}
+              collegeName={item.collegeDomain?.collegeName}
             />
           ))}
         </div>

@@ -18,6 +18,8 @@ interface DetailActionsProps {
   favoritesCount: number;
   status: string;
   title: string;
+  sellerCollegeDomainId?: string | null;
+  sellerCollegeName?: string | null;
 }
 
 export const DetailActions: React.FC<DetailActionsProps> = ({
@@ -29,6 +31,8 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
   favoritesCount: initialCount,
   status,
   title,
+  sellerCollegeDomainId,
+  sellerCollegeName,
 }) => {
   const router = useRouter();
   const { user } = useAuth();
@@ -190,30 +194,85 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
     }
   };
 
+  const isDifferentCampus = Boolean(user && user.collegeDomainId && sellerCollegeDomainId && user.collegeDomainId !== sellerCollegeDomainId);
+  const sellerCollegeShortName = sellerCollegeName ? sellerCollegeName.split("(")[0].trim() : "Seller's College";
+
   return (
     <div className="space-y-4 pt-2">
       {/* Buyer Actions */}
       {!isOwner ? (
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="primary"
-              size="lg"
-              isLoading={isChatLoading}
-              onClick={handleStartChat}
-              className="w-full rounded-xl font-semibold gap-2 shadow-sm"
-            >
-              <MessageSquare className="w-4 h-4" /> Message Seller
-            </Button>
+          {/* Different Campus Warning */}
+          {isDifferentCampus ? (
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-sm text-amber-800">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                Cross-Campus Restricted Item
+              </div>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                This item is listed exclusively for students of <strong>{sellerCollegeName}</strong>. To ensure in-person physical safety, item inspection, and verified exchange, students can only buy or trade with peers from their own college.
+              </p>
+              <div className="pt-1 text-[11px] text-amber-700">
+                Your registered campus: <strong className="text-amber-900">{user?.collegeName || "Your College"}</strong>
+              </div>
+            </div>
+          ) : user ? (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Same Campus ({user.collegeName?.split("(")[0]?.trim() || "Verified"}) — In-person exchange eligible</span>
+            </div>
+          ) : (
+            <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-800 text-xs flex items-center justify-between">
+              <span>Sign in with your verified college email to connect with this seller.</span>
+              <Link href="/login" className="font-bold underline text-indigo-700 ml-2">Login</Link>
+            </div>
+          )}
 
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={openExchangeModal}
-              className="w-full rounded-xl font-semibold gap-2 shadow-sm"
-            >
-              <Repeat className="w-4 h-4" /> Propose Trade
-            </Button>
+          <div className="grid grid-cols-2 gap-3">
+            {isDifferentCampus ? (
+              <>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  disabled
+                  title={`Direct chat is restricted to ${sellerCollegeShortName} students`}
+                  className="w-full rounded-xl font-semibold gap-2 opacity-50 cursor-not-allowed text-xs"
+                >
+                  <MessageSquare className="w-4 h-4" /> Message Seller
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  disabled
+                  title={`Trades are restricted to ${sellerCollegeShortName} students`}
+                  className="w-full rounded-xl font-semibold gap-2 opacity-50 cursor-not-allowed text-xs"
+                >
+                  <Repeat className="w-4 h-4" /> Propose Trade
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  isLoading={isChatLoading}
+                  onClick={handleStartChat}
+                  className="w-full rounded-xl font-semibold gap-2 shadow-sm"
+                >
+                  <MessageSquare className="w-4 h-4" /> Message Seller
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={openExchangeModal}
+                  className="w-full rounded-xl font-semibold gap-2 shadow-sm"
+                >
+                  <Repeat className="w-4 h-4" /> Propose Trade
+                </Button>
+              </>
+            )}
           </div>
 
           <Button

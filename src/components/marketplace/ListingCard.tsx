@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { formatPrice, timeAgo } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Heart, Repeat, UserCheck } from "lucide-react";
+import { Heart, Repeat, UserCheck, GraduationCap, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export interface ListingCardProps {
@@ -18,6 +18,8 @@ export interface ListingCardProps {
   categoryName?: string;
   sellerName?: string;
   sellerBranch?: string;
+  collegeDomainId?: string | null;
+  collegeName?: string | null;
   initialFavorited?: boolean;
 }
 
@@ -32,6 +34,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   categoryName,
   sellerName,
   sellerBranch,
+  collegeDomainId,
+  collegeName,
   initialFavorited = false,
 }) => {
   const { user } = useAuth();
@@ -72,9 +76,13 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   };
 
   const cond = conditionLabels[condition] || { label: condition, variant: "secondary" };
+  const isCrossCampus = Boolean(user && user.collegeDomainId && collegeDomainId && user.collegeDomainId !== collegeDomainId);
+  const collegeShortName = collegeName ? collegeName.split("(")[0].trim() : null;
 
   return (
-    <div className="group relative bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-xs hover:shadow-lg hover:border-zinc-300 transition-all duration-300 flex flex-col h-full">
+    <div className={`group relative bg-white rounded-2xl border overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
+      isCrossCampus ? "border-amber-200/80 hover:border-amber-300" : "border-zinc-200 hover:border-zinc-300"
+    }`}>
       <Link href={`/listings/${id}`} className="block relative aspect-4/3 overflow-hidden bg-zinc-100">
         <img
           src={imageUrl || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80"}
@@ -84,7 +92,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         />
 
         {/* Top Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
+        <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10 max-w-[80%]">
           <Badge variant={cond.variant} className="shadow-xs text-[11px] backdrop-blur-xs">
             {cond.label}
           </Badge>
@@ -97,6 +105,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <Badge variant="default" className="shadow-xs text-[11px] backdrop-blur-xs flex items-center gap-1">
               <Repeat className="w-3 h-3" /> Buy or Exchange
             </Badge>
+          )}
+          {collegeShortName && (
+            <span
+              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs ${
+                isCrossCampus
+                  ? "bg-amber-600/90 text-white"
+                  : "bg-indigo-900/80 text-white"
+              }`}
+            >
+              <GraduationCap className="w-3 h-3" />
+              <span className="truncate max-w-[120px]">{collegeShortName}</span>
+            </span>
           )}
         </div>
 
@@ -137,6 +157,13 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               {timeAgo(createdAt)}
             </span>
           </div>
+
+          {isCrossCampus && (
+            <div className="mt-2.5 py-1 px-2 rounded-lg bg-amber-50 border border-amber-200 text-[10px] text-amber-800 flex items-center gap-1 font-medium">
+              <AlertCircle className="w-3 h-3 text-amber-600 shrink-0" />
+              <span>Purchase restricted to {collegeShortName}</span>
+            </div>
+          )}
         </div>
 
         {/* Seller Info */}

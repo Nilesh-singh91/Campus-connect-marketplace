@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import { FilterSidebar } from "@/components/marketplace/FilterSidebar";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, PackageOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, PackageOpen, GraduationCap, ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +16,14 @@ interface BrowsePageProps {
     type?: string;
     minPrice?: string;
     maxPrice?: string;
+    college?: string;
     sort?: string;
     page?: string;
   }>;
 }
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
+  const session = await getSession();
   const params = await searchParams;
   const page = parseInt(params.page || "1", 10);
   const limit = 12;
@@ -29,6 +32,19 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const where: Prisma.ListingWhereInput = {
     status: "AVAILABLE",
   };
+
+  // College campus scoping:
+  // If ?college= is provided, filter by that college or show all if "all".
+  // If not provided and user is authenticated, default to their campus.
+  const activeCollegeFilter = params.college !== undefined ? params.college : (session?.collegeDomainId ? "my_campus" : "all");
+
+  if (activeCollegeFilter === "my_campus" && session?.collegeDomainId) {
+    where.collegeDomainId = session.collegeDomainId;
+  } else if (activeCollegeFilter && activeCollegeFilter !== "all" && activeCollegeFilter !== "my_campus") {
+    where.collegeDomain = {
+      OR: [{ id: activeCollegeFilter }, { domain: activeCollegeFilter }],
+    };
+  }
 
   if (params.query) {
     where.OR = [
@@ -59,8 +75,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   if (params.sort === "price_asc") orderBy = { price: "asc" };
   if (params.sort === "price_desc") orderBy = { price: "desc" };
 
-  const [categories, listings, total] = await Promise.all([
+  const [categories, collegeDomains, listings, total] = await Promise.all([
     db.category.findMany({
+      where: { isActive: true },
+      include: {
+        _count: { select: { listings: { where: { status: "AVAILABLE" } } } },
+      },
+    }),
+    db.collegeDomain.findMany({
       where: { isActive: true },
       include: {
         _count: { select: { listings: { where: { status: "AVAILABLE" } } } },
@@ -73,10 +95,13 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       take: limit,
       include: {
         category: true,
+        collegeDomain: true,
         images: { take: 1, orderBy: { displayOrder: "asc" } },
         user: {
           select: {
             id: true,
+            collegeDomainId: true,
+            collegeDomain: true,
             profile: { select: { fullName: true, branch: true } },
           },
         },
@@ -98,35 +123,95 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   return (
     <div className="space-y-6">
       {/* Top Banner / Heading */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-200">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Marketplace Catalog</h1>
-          <p className="text-sm text-zinc-500 mt-1">
-            Showing {total} verified student {total === 1 ? "item" : "items"} available on campus
-          </p>
+      <div className="space-y-4 pb-4 border-b border-zinc-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Marketplace Catalog</h1>
+            <p className="text-sm text-zinc-500 mt-1">
+              Showing {total} verified student {total === 1 ? "item" : "items"} available on campus
+            </p>
+          </div>
+
+          {/* Sort Select */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-zinc-500 text-xs font-medium">Sort by:</span>
+            <select
+              defaultValue={params.sort || "newest"}
+              onChange={(e) => {
+                window.location.href = buildUrlWithParam({ sort: e.target.value, page: 1 });
+              }}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="newest">Recently Listed</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
 
-        {/* Sort Select */}
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-zinc-500 text-xs font-medium">Sort by:</span>
-          <select
-            defaultValue={params.sort || "newest"}
-            onChange={(e) => {
-              window.location.href = buildUrlWithParam({ sort: e.target.value, page: 1 });
-            }}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 bg-white text-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        {/* Multi-College Campus Quick Tabs */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {session?.collegeDomainId && (
+            <Link
+              href={buildUrlWithParam({ college: "my_campus", page: 1 })}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                activeCollegeFilter === "my_campus"
+                  ? "bg-emerald-600 text-white shadow-xs"
+                  : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>My Campus ({session.collegeName?.split("(")[0]?.trim() || "Verified"})</span>
+            </Link>
+          )}
+
+          <Link
+            href={buildUrlWithParam({ college: "all", page: 1 })}
+            className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all ${
+              activeCollegeFilter === "all"
+                ? "bg-zinc-900 text-white"
+                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+            }`}
           >
-            <option value="newest">Recently Listed</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
+            All Campuses
+          </Link>
+
+          {collegeDomains.map((col) => {
+            const isSelected = activeCollegeFilter === col.id || activeCollegeFilter === col.domain;
+            return (
+              <Link
+                key={col.id}
+                href={buildUrlWithParam({ college: col.domain, page: 1 })}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1 transition-all ${
+                  isSelected
+                    ? "bg-indigo-600 text-white shadow-xs"
+                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                }`}
+              >
+                <GraduationCap className="w-3 h-3" />
+                <span>{col.collegeName.split("(")[0].trim()}</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Isolation Policy Banner */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-50 border border-zinc-200/80 text-[11px] text-zinc-600">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>
+            <strong>Campus Isolation Active:</strong> You can explore listings from all affiliated colleges, but transactions, in-person handovers, and chats are strictly restricted to students from the same college campus.
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Filter Sidebar */}
         <div className="lg:col-span-1">
-          <FilterSidebar categories={categories} />
+          <FilterSidebar
+            categories={categories}
+            colleges={collegeDomains}
+            userCollegeId={session?.collegeDomainId}
+          />
         </div>
 
         {/* Listings Grid */}
@@ -146,6 +231,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   categoryName={item.category.name}
                   sellerName={item.user.profile?.fullName}
                   sellerBranch={item.user.profile?.branch || undefined}
+                  collegeDomainId={item.collegeDomainId}
+                  collegeName={item.collegeDomain?.collegeName}
                 />
               ))}
             </div>

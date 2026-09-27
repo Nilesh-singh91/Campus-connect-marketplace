@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { ListingCard } from "@/components/marketplace/ListingCard";
 import { Button } from "@/components/ui/Button";
 import {
@@ -15,6 +16,8 @@ import {
   Home,
   Bike,
   Trophy,
+  Building2,
+  Lock,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +33,14 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default async function HomePage() {
+  const session = await getSession();
   let categories: any[] = [];
   let recentListings: any[] = [];
+  let colleges: any[] = [];
   let isDbConnected = true;
 
   try {
-    [categories, recentListings] = await Promise.all([
+    [categories, recentListings, colleges] = await Promise.all([
       db.category.findMany({
         where: { isActive: true },
         take: 6,
@@ -49,13 +54,22 @@ export default async function HomePage() {
         take: 8,
         include: {
           category: true,
+          collegeDomain: true,
           images: { take: 1, orderBy: { displayOrder: "asc" } },
           user: {
             select: {
               id: true,
+              collegeDomainId: true,
+              collegeDomain: true,
               profile: { select: { fullName: true, branch: true } },
             },
           },
+        },
+      }),
+      db.collegeDomain.findMany({
+        where: { isActive: true },
+        include: {
+          _count: { select: { listings: { where: { status: "AVAILABLE" } }, users: true } },
         },
       }),
     ]);
@@ -109,20 +123,25 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-12">
-      {/* Database Connection Notice Banner */}
-      {!isDbConnected && (
-        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 shadow-sm space-y-2">
-          <div className="flex items-center gap-2 font-bold text-base text-amber-950">
-            <span className="w-3 h-3 rounded-full bg-amber-500 animate-pulse" />
-            Database Server Offline (localhost:5432)
+      {/* Personalized Campus Welcome (when signed in) */}
+      {session && session.collegeDomainId && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shrink-0">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Welcome back, {session.fullName}!</h3>
+              <p className="text-xs text-indigo-700 mt-0.5">
+                Active campus network: <strong>{session.collegeName}</strong>. You are safely scoped to your college marketplace.
+              </p>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
-            CampusConnect is running with <strong>preview demo data</strong> because a PostgreSQL instance was not detected at <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-xs">localhost:5432</code>.
-          </p>
-          <div className="pt-1 text-xs text-amber-900 flex flex-wrap gap-4">
-            <span><strong>Option 1 (Fastest)</strong>: Use free cloud PostgreSQL (Neon.tech / Supabase) and paste URL into <code className="bg-amber-100 px-1 py-0.5 rounded">.env</code></span>
-            <span><strong>Option 2</strong>: Start local PostgreSQL service on port 5432</span>
-          </div>
+          <Link href="/browse?college=my_campus">
+            <Button size="sm" variant="primary" className="rounded-xl font-semibold text-xs whitespace-nowrap shadow-xs">
+              View {session.collegeName?.split("(")[0]?.trim()} Listings
+            </Button>
+          </Link>
         </div>
       )}
 
@@ -237,6 +256,8 @@ export default async function HomePage() {
                 categoryName={item.category.name}
                 sellerName={item.user.profile?.fullName}
                 sellerBranch={item.user.profile?.branch || undefined}
+                collegeDomainId={item.collegeDomainId}
+                collegeName={item.collegeDomain?.collegeName}
               />
             ))}
           </div>
@@ -253,6 +274,57 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/* Multi-College Network Showcase */}
+      {colleges.length > 0 && (
+        <section className="bg-white rounded-3xl border border-zinc-200 p-6 md:p-8 space-y-5 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-zinc-100 pb-4">
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-zinc-900 tracking-tight flex items-center gap-2">
+                <Building2 className="w-6 h-6 text-indigo-600" />
+                Affiliated Campuses & College Networks
+              </h2>
+              <p className="text-xs text-zinc-500 mt-1">
+                Each college operates its own secure, isolated peer-to-peer trading and exchange circle
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200 shrink-0">
+              <Lock className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Campus Isolation Protected</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {colleges.map((col) => (
+              <Link
+                key={col.id}
+                href={`/browse?college=${col.domain}`}
+                className="p-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/50 hover:bg-indigo-50/30 hover:border-indigo-300 transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100">
+                      @{col.domain}
+                    </span>
+                    <span className="text-xs text-zinc-400 font-medium">
+                      {col._count?.listings || 0} items
+                    </span>
+                  </div>
+                  <h4 className="font-semibold text-zinc-900 text-sm group-hover:text-indigo-600 transition-colors line-clamp-2">
+                    {col.collegeName}
+                  </h4>
+                </div>
+                <div className="pt-3 mt-3 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
+                  <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Verified Campus
+                  </span>
+                  <span className="text-indigo-600 font-semibold group-hover:underline">Explore &rarr;</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Safety & Trust Banner */}
       <section className="rounded-3xl bg-zinc-900 text-zinc-100 p-8 md:p-12">

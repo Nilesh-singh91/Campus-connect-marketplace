@@ -78,7 +78,7 @@ export default function LoginPage() {
             label="College Email"
             type="email"
             name="email"
-            placeholder="student@college.edu"
+            placeholder="student@liet.in, @aktu.in, or @college.edu"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -105,40 +105,68 @@ export default function LoginPage() {
           </p>
         </form>
 
-        {/* Demo Accounts Panel */}
+        {/* Multi-College Demo Accounts Panel */}
         <div className="pt-4 border-t border-zinc-100 space-y-2.5">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-600">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700">
             <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Quick 1-Click Demo Accounts (Evaluation):</span>
+            <span>1-Click Test Logins (Verify Campus Isolation):</span>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <button
-              type="button"
-              onClick={() => handleQuickDemo("aarav@college.edu", "Campus@1234")}
-              className="p-2 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-indigo-50 hover:border-indigo-200 text-left transition-colors cursor-pointer"
-            >
-              <p className="font-semibold text-zinc-800">Student</p>
-              <p className="text-[10px] text-zinc-500 truncate">aarav@college.edu</p>
-            </button>
 
-            <button
-              type="button"
-              onClick={() => handleQuickDemo("moderator@college.edu", "Campus@1234")}
-              className="p-2 rounded-lg border border-amber-200 bg-amber-50/50 hover:bg-amber-100 text-left transition-colors cursor-pointer"
-            >
-              <p className="font-semibold text-amber-800">Moderator</p>
-              <p className="text-[10px] text-zinc-500 truncate">moderator@...</p>
-            </button>
+          <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("aman@liet.in", "Campus@1234")}
+                className="p-2 rounded-xl border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100 text-left transition-colors cursor-pointer"
+              >
+                <p className="font-bold text-indigo-900 flex items-center gap-1">
+                  🏛️ Lloyd Student
+                </p>
+                <p className="text-[10px] text-indigo-700 truncate font-mono">aman@liet.in</p>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => handleQuickDemo("admin@college.edu", "Campus@1234")}
-              className="p-2 rounded-lg border border-purple-200 bg-purple-50/50 hover:bg-purple-100 text-left transition-colors cursor-pointer"
-            >
-              <p className="font-semibold text-purple-800">Admin</p>
-              <p className="text-[10px] text-zinc-500 truncate">admin@...</p>
-            </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("sneha@aktu.in", "Campus@1234")}
+                className="p-2 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100 text-left transition-colors cursor-pointer"
+              >
+                <p className="font-bold text-emerald-900 flex items-center gap-1">
+                  🏛️ AKTU Student
+                </p>
+                <p className="text-[10px] text-emerald-700 truncate font-mono">sneha@aktu.in</p>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5 text-xs">
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("aarav@college.edu", "Campus@1234")}
+                className="p-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-left transition-colors cursor-pointer"
+              >
+                <p className="font-semibold text-zinc-800 text-[11px]">NIT Student</p>
+                <p className="text-[9px] text-zinc-500 truncate">aarav@...</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("moderator@college.edu", "Campus@1234")}
+                className="p-1.5 rounded-lg border border-amber-200 bg-amber-50/50 hover:bg-amber-100 text-left transition-colors cursor-pointer"
+              >
+                <p className="font-semibold text-amber-800 text-[11px]">Moderator</p>
+                <p className="text-[9px] text-zinc-500 truncate">moderator@...</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickDemo("admin@college.edu", "Campus@1234")}
+                className="p-1.5 rounded-lg border border-purple-200 bg-purple-50/50 hover:bg-purple-100 text-left transition-colors cursor-pointer"
+              >
+                <p className="font-semibold text-purple-800 text-[11px]">Admin</p>
+                <p className="text-[9px] text-zinc-500 truncate">admin@...</p>
+              </button>
+            </div>
           </div>
+          <p className="text-[10px] text-zinc-400 italic text-center">Password for all test accounts: Campus@1234</p>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { successResponse, errorResponse, unauthorizedResponse } from "@/lib/api-response";
+import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from "@/lib/api-response";
 
 export async function GET() {
   try {
@@ -22,6 +22,8 @@ export async function GET() {
             title: true,
             price: true,
             status: true,
+            collegeDomainId: true,
+            collegeDomain: { select: { collegeName: true, domain: true } },
             images: { take: 1, select: { url: true } },
           },
         },
@@ -31,6 +33,8 @@ export async function GET() {
               select: {
                 id: true,
                 email: true,
+                collegeDomainId: true,
+                collegeDomain: { select: { collegeName: true, domain: true } },
                 profile: { select: { fullName: true, avatarUrl: true, branch: true } },
               },
             },
@@ -63,6 +67,55 @@ export async function POST(req: NextRequest) {
 
     if (recipientId === session.id) {
       return errorResponse("You cannot start a conversation with yourself", 400);
+    }
+
+    // College Isolation Check: Verify current user and recipient/listing campus
+    const currentUser = await db.user.findUnique({
+      where: { id: session.id },
+      include: { collegeDomain: true },
+    });
+
+    if (listingId) {
+      const listing = await db.listing.findUnique({
+        where: { id: listingId },
+        include: {
+          collegeDomain: true,
+          user: { include: { collegeDomain: true } },
+        },
+      });
+
+      if (!listing) {
+        return errorResponse("Item not found", 404);
+      }
+
+      const listingCampusId = listing.collegeDomainId || listing.user.collegeDomainId;
+      if (
+        currentUser?.collegeDomainId &&
+        listingCampusId &&
+        currentUser.collegeDomainId !== listingCampusId
+      ) {
+        const listingCollege = listing.collegeDomain?.collegeName || listing.user.collegeDomain?.collegeName || "another college";
+        const myCollege = currentUser.collegeDomain?.collegeName || "your college";
+        return forbiddenResponse(
+          `Campus Restriction: You can only communicate about and purchase items from students at ${myCollege}. This listing is restricted to ${listingCollege}.`
+        );
+      }
+    } else {
+      // Direct recipient check
+      const recipientUser = await db.user.findUnique({
+        where: { id: recipientId },
+        include: { collegeDomain: true },
+      });
+
+      if (
+        currentUser?.collegeDomainId &&
+        recipientUser?.collegeDomainId &&
+        currentUser.collegeDomainId !== recipientUser.collegeDomainId
+      ) {
+        return forbiddenResponse(
+          "Campus Restriction: Direct messaging is restricted to students registered at the same college campus."
+        );
+      }
     }
 
     // Check if conversation already exists between these 2 users for this listing

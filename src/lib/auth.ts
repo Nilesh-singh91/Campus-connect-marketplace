@@ -13,6 +13,8 @@ export interface SessionUser {
   role: Role;
   fullName: string;
   isEmailVerified: boolean;
+  collegeDomainId?: string | null;
+  collegeName?: string | null;
 }
 
 export async function hashPassword(password: string): Promise<string> {

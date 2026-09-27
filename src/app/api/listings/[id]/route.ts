@@ -28,6 +28,9 @@ export async function GET(
           orderBy: { displayOrder: "asc" },
         },
         category: true,
+        collegeDomain: {
+          select: { id: true, collegeName: true, domain: true },
+        },
         user: {
           select: {
             id: true,
@@ -36,7 +39,7 @@ export async function GET(
             isEmailVerified: true,
             createdAt: true,
             collegeDomain: {
-              select: { collegeName: true, domain: true },
+              select: { id: true, collegeName: true, domain: true },
             },
             profile: {
               select: {
@@ -74,13 +77,18 @@ export async function GET(
       isFavorited = !!fav;
     }
 
-    // Related listings in the same category
+    // Related listings in the same category on the same campus
+    const relatedWhere: any = {
+      categoryId: listing.categoryId,
+      id: { not: listing.id },
+      status: "AVAILABLE",
+    };
+    if (listing.collegeDomainId) {
+      relatedWhere.collegeDomainId = listing.collegeDomainId;
+    }
+
     const relatedListings = await db.listing.findMany({
-      where: {
-        categoryId: listing.categoryId,
-        id: { not: listing.id },
-        status: "AVAILABLE",
-      },
+      where: relatedWhere,
       take: 4,
       select: {
         id: true,
@@ -88,6 +96,10 @@ export async function GET(
         price: true,
         condition: true,
         transactionType: true,
+        collegeDomainId: true,
+        collegeDomain: {
+          select: { id: true, collegeName: true, domain: true },
+        },
         images: {
           take: 1,
           select: { url: true },

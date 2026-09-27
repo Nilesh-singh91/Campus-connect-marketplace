@@ -18,6 +18,10 @@ export async function GET() {
         role: true,
         isEmailVerified: true,
         status: true,
+        collegeDomainId: true,
+        collegeDomain: {
+          select: { collegeName: true, domain: true },
+        },
         profile: {
           select: {
             fullName: true,
@@ -43,6 +47,8 @@ export async function GET() {
         avatarUrl: user.profile?.avatarUrl || null,
         branch: user.profile?.branch || null,
         yearOfStudy: user.profile?.yearOfStudy || null,
+        collegeDomainId: user.collegeDomainId,
+        collegeName: user.collegeDomain?.collegeName || null,
       },
     });
   } catch (error) {

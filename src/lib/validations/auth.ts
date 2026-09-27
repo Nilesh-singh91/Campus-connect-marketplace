@@ -20,11 +20,14 @@ export const registerSchema = z.object({
         domain.endsWith(".edu") ||
         domain.endsWith(".ac.in") ||
         domain.endsWith(".edu.in") ||
+        domain.endsWith(".in") ||
         domain.includes("college") ||
         domain.includes("campus") ||
-        domain.includes("univ")
+        domain.includes("univ") ||
+        domain.includes("liet") ||
+        domain.includes("aktu")
       );
-    }, "Registration requires a recognized college/university email address (e.g. @college.edu, @lit.ac.in)"),
+    }, "Registration requires a recognized college/university email address (e.g. @liet.in, @aktu.in, @college.edu)"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
