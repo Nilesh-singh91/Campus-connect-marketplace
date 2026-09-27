@@ -28,7 +28,7 @@ describe("Business Logic & State Machine Unit Tests", () => {
     it("should enforce that only pending exchanges can transition", () => {
       const canTransition = (current: ExchangeStatus, next: ExchangeStatus) => {
         if (current !== ExchangeStatus.PENDING) return false;
-        return [ExchangeStatus.ACCEPTED, ExchangeStatus.REJECTED, ExchangeStatus.CANCELLED].includes(next);
+        return ([ExchangeStatus.ACCEPTED, ExchangeStatus.REJECTED, ExchangeStatus.CANCELLED] as ExchangeStatus[]).includes(next);
       };
 
       expect(canTransition(ExchangeStatus.PENDING, ExchangeStatus.ACCEPTED)).toBe(true);

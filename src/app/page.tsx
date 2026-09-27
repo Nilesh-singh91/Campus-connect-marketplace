@@ -32,6 +32,7 @@ const iconMap: Record<string, React.ReactNode> = {
 export default async function HomePage() {
   let categories: any[] = [];
   let recentListings: any[] = [];
+  let isDbConnected = true;
 
   try {
     [categories, recentListings] = await Promise.all([
@@ -58,12 +59,73 @@ export default async function HomePage() {
         },
       }),
     ]);
-  } catch (e) {
-    console.error("Home page DB fetch error:", e);
+  } catch {
+    isDbConnected = false;
+    // Fallback categories so homepage renders smoothly even before database is started
+    categories = [
+      { id: "1", name: "Textbooks & Reference Books", slug: "textbooks", icon: "BookOpen", _count: { listings: 12 } },
+      { id: "2", name: "Electronics & Gadgets", slug: "electronics", icon: "Laptop", _count: { listings: 8 } },
+      { id: "3", name: "Engineering Equipment & Tools", slug: "engineering-tools", icon: "Wrench", _count: { listings: 6 } },
+      { id: "4", name: "Handwritten Notes & Materials", slug: "notes-materials", icon: "FileText", _count: { listings: 15 } },
+      { id: "5", name: "Hostel & Room Essentials", slug: "hostel-essentials", icon: "Home", _count: { listings: 9 } },
+      { id: "6", name: "Bicycles & Campus Mobility", slug: "cycles-mobility", icon: "Bike", _count: { listings: 4 } },
+    ];
+    recentListings = [
+      {
+        id: "demo-1",
+        title: "CLRS Introduction to Algorithms (4th Edition)",
+        price: 850,
+        condition: "LIKE_NEW",
+        transactionType: "SELL",
+        createdAt: new Date(),
+        images: [{ url: "https://images.unsplash.com/photo-1532012164546-f432f2e3edd7?auto=format&fit=crop&w=800&q=80" }],
+        category: { name: "Textbooks & Reference Books" },
+        user: { profile: { fullName: "Aarav Sharma", branch: "Computer Science" } },
+      },
+      {
+        id: "demo-2",
+        title: "Casio fx-991EX ClassWiz Scientific Calculator",
+        price: 650,
+        condition: "GOOD",
+        transactionType: "BOTH",
+        createdAt: new Date(),
+        images: [{ url: "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80" }],
+        category: { name: "Electronics & Gadgets" },
+        user: { profile: { fullName: "Priya Patel", branch: "Electronics" } },
+      },
+      {
+        id: "demo-3",
+        title: "Hero Sprint 26T Geared Bicycle with Lock",
+        price: 3200,
+        condition: "GOOD",
+        transactionType: "SELL",
+        createdAt: new Date(),
+        images: [{ url: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80" }],
+        category: { name: "Bicycles & Campus Mobility" },
+        user: { profile: { fullName: "Aarav Sharma", branch: "Computer Science" } },
+      },
+    ];
   }
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-12">
+      {/* Database Connection Notice Banner */}
+      {!isDbConnected && (
+        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 shadow-sm space-y-2">
+          <div className="flex items-center gap-2 font-bold text-base text-amber-950">
+            <span className="w-3 h-3 rounded-full bg-amber-500 animate-pulse" />
+            Database Server Offline (localhost:5432)
+          </div>
+          <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
+            CampusConnect is running with <strong>preview demo data</strong> because a PostgreSQL instance was not detected at <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-xs">localhost:5432</code>.
+          </p>
+          <div className="pt-1 text-xs text-amber-900 flex flex-wrap gap-4">
+            <span><strong>Option 1 (Fastest)</strong>: Use free cloud PostgreSQL (Neon.tech / Supabase) and paste URL into <code className="bg-amber-100 px-1 py-0.5 rounded">.env</code></span>
+            <span><strong>Option 2</strong>: Start local PostgreSQL service on port 5432</span>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative rounded-3xl bg-linear-to-b from-indigo-900 via-indigo-950 to-zinc-950 text-white p-8 md:p-14 overflow-hidden shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:24px_24px] opacity-20" />
