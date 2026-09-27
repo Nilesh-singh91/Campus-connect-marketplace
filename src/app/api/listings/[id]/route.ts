@@ -159,6 +159,9 @@ export async function PATCH(
     if (body.status !== undefined && Object.values(ListingStatus).includes(body.status)) {
       updateData.status = body.status;
     }
+    if (body.campusOnly !== undefined) {
+      updateData.campusOnly = Boolean(body.campusOnly);
+    }
 
     const updated = await db.listing.update({
       where: { id },
@@ -166,6 +169,7 @@ export async function PATCH(
       include: {
         images: true,
         category: true,
+        collegeDomain: true,
       },
     });
 

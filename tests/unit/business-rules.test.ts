@@ -179,5 +179,47 @@ describe("Business Logic & State Machine Unit Tests", () => {
       });
       expect(emptyImagesListing.success).toBe(false);
     });
+
+    it("should support campusOnly option with default true and explicit false toggle", async () => {
+      const { listingSchema, listingQuerySchema } = await import("@/lib/validations/listing");
+      const { ItemCondition, TransactionType } = await import("@/types/enums");
+
+      const basePayload = {
+        title: "Scientific Calculator Casio fx-991EX",
+        description: "Classwiz non-programmable calculator, approved for semester exams.",
+        price: 800,
+        condition: ItemCondition.LIKE_NEW,
+        transactionType: TransactionType.SELL,
+        categoryId: "e9f73a20-be43-4a5b-b9ca-8e3de221b2b2",
+        images: ["/uploads/listings/calculator.jpg"],
+      };
+
+      // Default when omitted -> campusOnly is true
+      const parsedDefault = listingSchema.safeParse(basePayload);
+      expect(parsedDefault.success).toBe(true);
+      if (parsedDefault.success) {
+        expect(parsedDefault.data.campusOnly).toBe(true);
+      }
+
+      // Explicitly set to campusOnly: true
+      const parsedCampusOnly = listingSchema.safeParse({ ...basePayload, campusOnly: true });
+      expect(parsedCampusOnly.success).toBe(true);
+      if (parsedCampusOnly.success) {
+        expect(parsedCampusOnly.data.campusOnly).toBe(true);
+      }
+
+      // Explicitly set to campusOnly: false (Multi-College Discovery)
+      const parsedMultiCampus = listingSchema.safeParse({ ...basePayload, campusOnly: false });
+      expect(parsedMultiCampus.success).toBe(true);
+      if (parsedMultiCampus.success) {
+        expect(parsedMultiCampus.data.campusOnly).toBe(false);
+      }
+
+      // Query schema filter by campusOnly
+      expect(listingQuerySchema.safeParse({ campusOnly: "true" }).success).toBe(true);
+      expect(listingQuerySchema.safeParse({ campusOnly: "false" }).success).toBe(true);
+      expect(listingQuerySchema.safeParse({ campusOnly: "all" }).success).toBe(true);
+      expect(listingQuerySchema.safeParse({ campusOnly: "invalid_value" }).success).toBe(false);
+    });
   });
 });

@@ -19,6 +19,8 @@ import {
   Edit,
   Trash2,
   Share2,
+  Lock,
+  Globe,
 } from "lucide-react";
 import { DetailActions } from "./DetailActions";
 
@@ -164,6 +166,17 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant={stat.variant}>{stat.label}</Badge>
                 <Badge variant={cond.variant}>{cond.label}</Badge>
+                {listing.campusOnly !== false ? (
+                  <Badge variant="success" className="flex items-center gap-1 bg-emerald-50 text-emerald-800 border-emerald-300">
+                    <Lock className="w-3 h-3 text-emerald-700" />
+                    Campus Only
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="flex items-center gap-1 bg-indigo-50 text-indigo-700 border-indigo-200">
+                    <Globe className="w-3 h-3 text-indigo-600" />
+                    Multi-Campus
+                  </Badge>
+                )}
                 {listing.transactionType === "EXCHANGE" && (
                   <Badge variant="warning" className="flex items-center gap-1">
                     <Repeat className="w-3 h-3" /> Exchange Only
@@ -210,6 +223,16 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               </p>
             </div>
 
+            {/* Campus Isolation Info Banner */}
+            {listing.campusOnly !== false && (
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-800 font-medium">
+                <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  <strong>Campus Exclusive:</strong> Restricted strictly to verified students of {listing.collegeDomain?.collegeName?.split("(")[0]?.trim() || "this campus"} for direct hand-to-hand exchange.
+                </span>
+              </div>
+            )}
+
             {/* Interaction Buttons (Client Actions) */}
             <DetailActions
               listingId={listing.id}
@@ -222,6 +245,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               title={listing.title}
               sellerCollegeDomainId={listing.collegeDomainId || listing.user.collegeDomainId}
               sellerCollegeName={listing.collegeDomain?.collegeName || listing.user.collegeDomain?.collegeName}
+              campusOnly={listing.campusOnly !== false}
             />
 
             {/* Report Link */}

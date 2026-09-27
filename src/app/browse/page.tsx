@@ -18,6 +18,7 @@ interface BrowsePageProps {
     minPrice?: string;
     maxPrice?: string;
     college?: string;
+    campusOnly?: string;
     sort?: string;
     page?: string;
   }>;
@@ -64,6 +65,12 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
   if (params.type) {
     where.transactionType = params.type as any;
+  }
+
+  if (params.campusOnly === "true") {
+    where.campusOnly = true;
+  } else if (params.campusOnly === "false") {
+    where.campusOnly = false;
   }
 
   if (params.minPrice || params.maxPrice) {
@@ -221,6 +228,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   sellerBranch={item.user.profile?.branch || undefined}
                   collegeDomainId={item.collegeDomainId}
                   collegeName={item.collegeDomain?.collegeName}
+                  campusOnly={item.campusOnly}
                 />
               ))}
             </div>

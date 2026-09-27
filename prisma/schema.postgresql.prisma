@@ -159,6 +159,7 @@ model Listing {
   condition       ItemCondition   @default(GOOD)
   transactionType TransactionType @default(SELL)
   status          ListingStatus   @default(AVAILABLE)
+  campusOnly      Boolean         @default(true)
   views           Int             @default(0)
   userId          String
   categoryId      String
@@ -179,6 +180,7 @@ model Listing {
   @@index([userId])
   @@index([categoryId])
   @@index([collegeDomainId])
+  @@index([campusOnly])
   @@index([status])
   @@index([transactionType])
   @@index([price])

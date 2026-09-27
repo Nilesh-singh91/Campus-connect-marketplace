@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
       minPrice,
       maxPrice,
       college,
+      campusOnly,
       sort,
       page,
       limit,
@@ -32,6 +33,12 @@ export async function GET(req: NextRequest) {
     const where: Prisma.ListingWhereInput = {
       status: "AVAILABLE",
     };
+
+    if (campusOnly === "true") {
+      where.campusOnly = true;
+    } else if (campusOnly === "false") {
+      where.campusOnly = false;
+    }
 
     // Campus-level filtering:
     // If college param is specified:
@@ -93,6 +100,7 @@ export async function GET(req: NextRequest) {
           condition: true,
           transactionType: true,
           status: true,
+          campusOnly: true,
           views: true,
           collegeDomainId: true,
           createdAt: true,
@@ -171,7 +179,7 @@ export async function POST(req: NextRequest) {
       return errorResponse("Validation error", 422, validated.error.flatten().fieldErrors);
     }
 
-    const { title, description, price, condition, transactionType, categoryId, images } = validated.data;
+    const { title, description, price, condition, transactionType, categoryId, campusOnly, images } = validated.data;
 
     // Verify category exists
     const cat = await db.category.findUnique({ where: { id: categoryId } });
@@ -187,6 +195,7 @@ export async function POST(req: NextRequest) {
         condition,
         transactionType,
         categoryId,
+        campusOnly: campusOnly !== undefined ? campusOnly : true,
         userId: session.id,
         collegeDomainId: user.collegeDomainId || session.collegeDomainId || null,
         images: {

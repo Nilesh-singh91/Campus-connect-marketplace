@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { formatPrice, timeAgo } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Heart, Repeat, UserCheck, GraduationCap, AlertCircle } from "lucide-react";
+import { Heart, Repeat, UserCheck, GraduationCap, AlertCircle, Lock, Globe } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export interface ListingCardProps {
@@ -20,6 +20,7 @@ export interface ListingCardProps {
   sellerBranch?: string;
   collegeDomainId?: string | null;
   collegeName?: string | null;
+  campusOnly?: boolean;
   initialFavorited?: boolean;
 }
 
@@ -36,6 +37,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   sellerBranch,
   collegeDomainId,
   collegeName,
+  campusOnly = true,
   initialFavorited = false,
 }) => {
   const { user } = useAuth();
@@ -96,6 +98,23 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           <Badge variant={cond.variant} className="shadow-xs text-[11px] backdrop-blur-xs">
             {cond.label}
           </Badge>
+          {campusOnly !== false ? (
+            <span
+              className="text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs bg-emerald-800/90 text-white"
+              title="Restricted to this college campus"
+            >
+              <Lock className="w-2.5 h-2.5" />
+              <span>Campus Only</span>
+            </span>
+          ) : (
+            <span
+              className="text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs bg-blue-800/90 text-white"
+              title="Visible across partner colleges"
+            >
+              <Globe className="w-2.5 h-2.5" />
+              <span>Multi-Campus</span>
+            </span>
+          )}
           {transactionType === "EXCHANGE" && (
             <Badge variant="warning" className="shadow-xs text-[11px] backdrop-blur-xs flex items-center gap-1">
               <Repeat className="w-3 h-3" /> Exchange Only

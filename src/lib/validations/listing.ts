@@ -23,6 +23,7 @@ export const listingSchema = z.object({
     errorMap: () => ({ message: "Please select a valid transaction type" }),
   }),
   categoryId: z.string().uuid("Please select a valid category"),
+  campusOnly: z.boolean().default(true),
   images: z
     .array(
       z.string().refine(
@@ -48,6 +49,7 @@ export const listingQuerySchema = z.object({
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
   college: z.string().optional(),
+  campusOnly: z.enum(["true", "false", "all"]).optional(),
   sort: z.enum(["newest", "price_asc", "price_desc"]).default("newest"),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(12),

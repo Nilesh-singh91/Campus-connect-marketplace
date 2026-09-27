@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { RotateCcw, GraduationCap } from "lucide-react";
+import { RotateCcw, GraduationCap, Lock, Globe } from "lucide-react";
 
 interface CategoryOption {
   id: string;
@@ -31,6 +31,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, colleg
 
   const currentCategory = searchParams.get("category") || "";
   const currentCollege = searchParams.get("college") || "";
+  const currentCampusOnly = searchParams.get("campusOnly") || "";
   const currentCondition = searchParams.get("condition") || "";
   const currentType = searchParams.get("type") || "";
   const currentSort = searchParams.get("sort") || "newest";
@@ -83,7 +84,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, colleg
     { label: "Sell or Exchange", value: "BOTH" },
   ];
 
-  const hasActiveFilters = !!(currentCategory || currentCollege || currentCondition || currentType || minPrice || maxPrice);
+  const hasActiveFilters = !!(currentCategory || currentCollege || currentCampusOnly || currentCondition || currentType || minPrice || maxPrice);
 
   return (
     <div className="bg-white rounded-2xl border border-zinc-200 p-5 space-y-6 shadow-xs">
@@ -139,6 +140,42 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, colleg
           </div>
         </div>
       )}
+
+      {/* Campus Restriction Scope Filter */}
+      <div className="pb-4 border-b border-zinc-100">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2.5 flex items-center gap-1.5">
+          <Lock className="w-3.5 h-3.5 text-emerald-600" />
+          Campus Scope
+        </h4>
+        <div className="space-y-1">
+          <button
+            onClick={() => updateFilter("campusOnly", "")}
+            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+              !currentCampusOnly ? "bg-indigo-50 text-indigo-700 font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            All Items
+          </button>
+          <button
+            onClick={() => updateFilter("campusOnly", "true")}
+            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+              currentCampusOnly === "true" ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            <Lock className="w-3 h-3 text-emerald-600" />
+            <span>Campus Exclusive Only</span>
+          </button>
+          <button
+            onClick={() => updateFilter("campusOnly", "false")}
+            className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+              currentCampusOnly === "false" ? "bg-blue-50 text-blue-700 font-semibold" : "text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            <Globe className="w-3 h-3 text-blue-600" />
+            <span>Multi-Campus Visible</span>
+          </button>
+        </div>
+      </div>
 
       {/* Category List */}
       <div>

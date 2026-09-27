@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { PlusCircle, Upload, X, AlertCircle, ShieldAlert, Sparkles, Image as ImageIcon, GraduationCap } from "lucide-react";
+import { PlusCircle, Upload, X, AlertCircle, ShieldAlert, Sparkles, Image as ImageIcon, GraduationCap, Lock, Globe, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default function CreateListingPage() {
@@ -20,6 +20,7 @@ export default function CreateListingPage() {
     condition: "GOOD",
     transactionType: "SELL",
     categoryId: "",
+    campusOnly: true,
   });
 
   const [images, setImages] = useState<string[]>([]);
@@ -121,6 +122,7 @@ export default function CreateListingPage() {
           condition: formData.condition,
           transactionType: formData.transactionType,
           categoryId: formData.categoryId,
+          campusOnly: formData.campusOnly,
           images,
         }),
       });
@@ -352,6 +354,92 @@ export default function CreateListingPage() {
               required
             />
             {errors.description && <p className="text-xs text-rose-500 font-medium">{errors.description}</p>}
+          </div>
+
+          {/* Campus Restriction & Visibility Scope */}
+          <div className="space-y-3 p-4 sm:p-5 rounded-2xl bg-zinc-50 border border-zinc-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+              <label className="block text-sm font-semibold text-zinc-900 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-emerald-600" />
+                Campus Restriction &amp; Visibility
+              </label>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full self-start sm:self-auto">
+                Campus Isolation
+              </span>
+            </div>
+            <p className="text-xs text-zinc-500">
+              Decide whether this listing is exclusively restricted to your college campus or open to multi-college discovery.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {/* Option 1: Strictly My Campus Only */}
+              <div
+                onClick={() => setFormData({ ...formData, campusOnly: true })}
+                className={`relative p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData.campusOnly
+                    ? "border-emerald-500 bg-emerald-50/50 shadow-xs"
+                    : "border-zinc-200 bg-white hover:border-zinc-300"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    formData.campusOnly ? "bg-emerald-600 text-white" : "bg-zinc-100 text-zinc-600"
+                  }`}>
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-sm font-bold text-zinc-900">
+                        Restricted to My Campus
+                      </span>
+                      {formData.campusOnly && (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      )}
+                    </div>
+                    <span className="inline-block mt-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                      Recommended for safety
+                    </span>
+                    <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
+                      Only verified students from <strong>{user?.collegeName?.split("(")[0]?.trim() || "your college"}</strong> can view and purchase this item. Guarantees safe on-campus physical exchange.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Option 2: Multi-College Discovery */}
+              <div
+                onClick={() => setFormData({ ...formData, campusOnly: false })}
+                className={`relative p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                  !formData.campusOnly
+                    ? "border-indigo-500 bg-indigo-50/50 shadow-xs"
+                    : "border-zinc-200 bg-white hover:border-zinc-300"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    !formData.campusOnly ? "bg-indigo-600 text-white" : "bg-zinc-100 text-zinc-600"
+                  }`}>
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-sm font-bold text-zinc-900">
+                        Multi-College Discovery
+                      </span>
+                      {!formData.campusOnly && (
+                        <CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0" />
+                      )}
+                    </div>
+                    <span className="inline-block mt-0.5 text-[10px] font-semibold text-zinc-600 bg-zinc-200/70 px-1.5 py-0.5 rounded">
+                      Inter-College
+                    </span>
+                    <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
+                      Visible in catalogs across partner institutions (LIET, AKTU, NIT). Expands your reach to student peers across colleges.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <Button
