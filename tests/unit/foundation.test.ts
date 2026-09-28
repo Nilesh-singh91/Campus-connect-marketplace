@@ -171,4 +171,26 @@ describe("Foundation Unit Tests", () => {
       expect(invalidResult.success).toBe(false);
     });
   });
+
+  describe("File Upload & Storage Provider Rules", () => {
+    it("should allow standard image MIME types (JPEG, PNG, WebP, GIF)", async () => {
+      const { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } = await import("@/lib/storage");
+      expect(ALLOWED_MIME_TYPES).toContain("image/jpeg");
+      expect(ALLOWED_MIME_TYPES).toContain("image/png");
+      expect(ALLOWED_MIME_TYPES).toContain("image/webp");
+      expect(MAX_FILE_SIZE).toBe(5 * 1024 * 1024);
+    });
+
+    it("should reject non-image file uploads in storage provider", async () => {
+      const { LocalStorageProvider } = await import("@/lib/storage");
+      const provider = new LocalStorageProvider();
+      await expect(
+        provider.upload({
+          buffer: Buffer.from("dummy pdf content"),
+          name: "certificate.pdf",
+          mimeType: "application/pdf",
+        })
+      ).rejects.toThrow("Unsupported file type");
+    });
+  });
 });
