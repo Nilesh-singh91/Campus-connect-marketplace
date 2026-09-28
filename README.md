@@ -15,7 +15,7 @@
   <b>A production-grade, deployable B.Tech CSE Major Capstone Project built for university placements, engineering portfolio, and real-world campus trade.</b>
 </p>
 
-[Explore Catalog](http://localhost:3000/browse) • [Lost & Found](http://localhost:3000/lost-and-found) • [AI Valuation](http://localhost:3000/ai-price-estimator) • [Free Corner (₹0)](http://localhost:3000/browse?type=DONATION) • [Key Features](#-3-key-features) • [Architecture](#-6-system-architecture) • [Demo Logins](#-7-pre-configured-demo-accounts)
+[Explore Catalog](http://localhost:3000/browse) • [Lost & Found](http://localhost:3000/lost-and-found) • [AI Valuation](http://localhost:3000/ai-price-estimator) • [Free Corner (₹0)](http://localhost:3000/browse?type=DONATION) • [📄 Project Synopsis PDF](./docs/CampusConnect_Marketplace_Major_Project_Synopsis.pdf) • [Key Features](#-3-key-features) • [Architecture](#-6-system-architecture) • [Demo Logins](#-7-pre-configured-demo-accounts)
 
 </div>
 
