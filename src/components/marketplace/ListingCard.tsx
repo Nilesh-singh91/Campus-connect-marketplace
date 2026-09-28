@@ -125,6 +125,16 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               <Repeat className="w-3 h-3" /> Buy or Exchange
             </Badge>
           )}
+          {transactionType === "DONATION" && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs bg-emerald-600 text-white animate-pulse">
+              🎁 Free Giveaway
+            </span>
+          )}
+          {transactionType === "SKILL_EXCHANGE" && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs bg-purple-600 text-white">
+              💡 Skill Barter
+            </span>
+          )}
           {collegeShortName && (
             <span
               className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs backdrop-blur-xs ${
@@ -169,9 +179,19 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             </h3>
           </Link>
           <div className="mt-2 flex items-baseline justify-between">
-            <p className="text-lg font-bold text-zinc-950">
-              {transactionType === "EXCHANGE" ? "Exchange Only" : formatPrice(price)}
-            </p>
+            <div className="text-lg font-bold text-zinc-950">
+              {transactionType === "DONATION" ? (
+                <span className="text-emerald-600 font-extrabold flex items-center gap-1">
+                  FREE <span className="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded">₹0</span>
+                </span>
+              ) : transactionType === "SKILL_EXCHANGE" ? (
+                <span className="text-purple-600 font-extrabold text-base">Skill Barter</span>
+              ) : transactionType === "EXCHANGE" ? (
+                "Exchange Only"
+              ) : (
+                formatPrice(price)
+              )}
+            </div>
             <span className="text-xs text-zinc-400 font-medium">
               {timeAgo(createdAt)}
             </span>

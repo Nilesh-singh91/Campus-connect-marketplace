@@ -14,8 +14,9 @@ model CollegeDomain {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
 
-  users    User[]
-  listings Listing[]
+  users             User[]
+  listings          Listing[]
+  lostAndFoundItems LostAndFoundItem[]
 
   @@map("college_domains")
 }
@@ -44,6 +45,8 @@ model User {
   reportsReceived   Report[]             @relation("TargetUser")
   moderationActions ModerationAction[]   @relation("ModeratorActions")
   notifications     Notification[]
+  lostAndFoundItems LostAndFoundItem[]
+  lostFoundClaims   LostFoundClaim[]
 
   @@index([role])
   @@index([status])
@@ -276,4 +279,52 @@ model Notification {
   @@index([isRead])
   @@index([createdAt])
   @@map("notifications")
+}
+
+model LostAndFoundItem {
+  id              String    @id @default(uuid())
+  type            String    @default("FOUND") // "LOST" | "FOUND"
+  title           String
+  description     String
+  category        String    // "ID_CARD" | "CALCULATOR" | "ELECTRONICS" | "KEYS_WALLET" | "DOCUMENTS" | "OTHER"
+  location        String    // e.g. "Computer Lab 3, Ground Floor"
+  custodyLocation String?   // e.g. "With Student Finder" | "Submitted to Library Desk"
+  secretQuestion  String?   // Verification question asked to claimant
+  imageUrl        String?
+  status          String    @default("OPEN") // "OPEN" | "CLAIMED" | "RESOLVED"
+  resolvedAt      DateTime?
+  
+  userId          String
+  collegeDomainId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collegeDomain CollegeDomain? @relation(fields: [collegeDomainId], references: [id], onDelete: SetNull)
+  claims        LostFoundClaim[]
+
+  @@index([userId])
+  @@index([collegeDomainId])
+  @@index([type])
+  @@index([status])
+  @@map("lost_and_found_items")
+}
+
+model LostFoundClaim {
+  id              String    @id @default(uuid())
+  itemId          String
+  claimantId      String
+  proofText       String    // Secret proof provided by the claimant
+  status          String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED" | "RESOLVED"
+  verificationOtp String?   // 4-digit handshake OTP
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  item     LostAndFoundItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  claimant User             @relation(fields: [claimantId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([claimantId])
+  @@map("lost_found_claims")
 }

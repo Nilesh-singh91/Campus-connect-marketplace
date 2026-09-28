@@ -81,6 +81,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, colleg
     { label: "All Types", value: "" },
     { label: "For Sale Only", value: "SELL" },
     { label: "Exchanges Only", value: "EXCHANGE" },
+    { label: "🎁 Free Giveaways (₹0)", value: "DONATION" },
+    { label: "💡 Skill Barter", value: "SKILL_EXCHANGE" },
     { label: "Sell or Exchange", value: "BOTH" },
   ];
 

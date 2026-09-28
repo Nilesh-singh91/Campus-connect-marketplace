@@ -33,6 +33,14 @@ export const listingSchema = z.object({
     )
     .min(1, "At least one product image is required")
     .max(6, "Maximum 6 images allowed per listing"),
+}).superRefine((data, ctx) => {
+  if (data.transactionType === TransactionType.DONATION && data.price > 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Free Giveaway items must have a price of ₹0",
+      path: ["price"],
+    });
+  }
 });
 
 export const updateListingStatusSchema = z.object({

@@ -24,6 +24,8 @@ export const TransactionType = {
   SELL: "SELL",
   EXCHANGE: "EXCHANGE",
   BOTH: "BOTH",
+  DONATION: "DONATION", // 🎁 End-of-Semester Free Campus Giveaway (₹0)
+  SKILL_EXCHANGE: "SKILL_EXCHANGE", // 💡 Skill & Academic Barter
 } as const;
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
 
@@ -71,6 +73,38 @@ export const NotificationType = {
   EXCHANGE_REQUEST: "EXCHANGE_REQUEST",
   LISTING_UPDATE: "LISTING_UPDATE",
   REPORT_STATUS: "REPORT_STATUS",
+  LOST_FOUND_CLAIM: "LOST_FOUND_CLAIM",
   SYSTEM: "SYSTEM",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
+
+export const LostFoundType = {
+  LOST: "LOST",
+  FOUND: "FOUND",
+} as const;
+export type LostFoundType = (typeof LostFoundType)[keyof typeof LostFoundType];
+
+export const LostFoundCategory = {
+  ID_CARD: "ID_CARD",
+  CALCULATOR: "CALCULATOR",
+  ELECTRONICS: "ELECTRONICS",
+  KEYS_WALLET: "KEYS_WALLET",
+  DOCUMENTS: "DOCUMENTS",
+  OTHER: "OTHER",
+} as const;
+export type LostFoundCategory = (typeof LostFoundCategory)[keyof typeof LostFoundCategory];
+
+export const LostFoundStatus = {
+  OPEN: "OPEN",
+  CLAIMED: "CLAIMED",
+  RESOLVED: "RESOLVED",
+} as const;
+export type LostFoundStatus = (typeof LostFoundStatus)[keyof typeof LostFoundStatus];
+
+export const LostFoundClaimStatus = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  RESOLVED: "RESOLVED",
+} as const;
+export type LostFoundClaimStatus = (typeof LostFoundClaimStatus)[keyof typeof LostFoundClaimStatus];

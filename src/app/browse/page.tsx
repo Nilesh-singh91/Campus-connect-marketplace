@@ -190,6 +190,61 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           })}
         </div>
 
+        {/* Transaction Type Filter Chips */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-100">
+          <span className="text-xs font-semibold text-zinc-400 mr-1">Mode:</span>
+          <Link
+            href={buildUrlWithParam({ type: "", page: 1 })}
+            className={`text-xs font-medium px-3 py-1 rounded-full transition-all ${
+              !params.type
+                ? "bg-zinc-900 text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+            }`}
+          >
+            All Items
+          </Link>
+          <Link
+            href={buildUrlWithParam({ type: "SELL", page: 1 })}
+            className={`text-xs font-medium px-3 py-1 rounded-full transition-all ${
+              params.type === "SELL"
+                ? "bg-indigo-600 text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+            }`}
+          >
+            💰 Buy &amp; Sell
+          </Link>
+          <Link
+            href={buildUrlWithParam({ type: "EXCHANGE", page: 1 })}
+            className={`text-xs font-medium px-3 py-1 rounded-full transition-all ${
+              params.type === "EXCHANGE"
+                ? "bg-amber-600 text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+            }`}
+          >
+            🔄 Item Exchanges
+          </Link>
+          <Link
+            href={buildUrlWithParam({ type: "DONATION", page: 1 })}
+            className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+              params.type === "DONATION"
+                ? "bg-emerald-600 text-white shadow-xs"
+                : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
+            }`}
+          >
+            🎁 Free Giveaways (₹0)
+          </Link>
+          <Link
+            href={buildUrlWithParam({ type: "SKILL_EXCHANGE", page: 1 })}
+            className={`text-xs font-semibold px-3 py-1 rounded-full transition-all ${
+              params.type === "SKILL_EXCHANGE"
+                ? "bg-purple-600 text-white shadow-xs"
+                : "bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200"
+            }`}
+          >
+            💡 Skill Barter
+          </Link>
+        </div>
+
         {/* Isolation Policy Banner */}
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-50 border border-zinc-200/80 text-[11px] text-zinc-600">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />

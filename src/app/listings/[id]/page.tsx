@@ -187,6 +187,16 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                     <Repeat className="w-3 h-3" /> Buy or Exchange
                   </Badge>
                 )}
+                {listing.transactionType === "DONATION" && (
+                  <Badge variant="success" className="bg-emerald-600 text-white font-bold">
+                    🎁 Free Giveaway (₹0)
+                  </Badge>
+                )}
+                {listing.transactionType === "SKILL_EXCHANGE" && (
+                  <Badge variant="default" className="bg-purple-600 text-white font-bold">
+                    💡 Skill &amp; Academic Barter
+                  </Badge>
+                )}
                 <Badge variant="secondary" className="flex items-center gap-1 bg-indigo-50 text-indigo-700 border-indigo-200">
                   <GraduationCap className="w-3.5 h-3.5" />
                   {listing.collegeDomain?.collegeName?.split("(")[0]?.trim() || listing.user.collegeDomain?.collegeName?.split("(")[0]?.trim() || "Campus Verified"}
@@ -204,12 +214,25 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 {listing.title}
               </h1>
               <div className="mt-3 flex items-baseline gap-3">
-                <span className="text-3xl font-extrabold text-zinc-950">
-                  {listing.transactionType === "EXCHANGE" ? "Exchange Only" : formatPrice(listing.price)}
-                </span>
+                <div className="text-3xl font-extrabold text-zinc-950">
+                  {listing.transactionType === "DONATION" ? (
+                    <span className="text-emerald-600 font-extrabold">FREE (₹0)</span>
+                  ) : listing.transactionType === "SKILL_EXCHANGE" ? (
+                    <span className="text-purple-600 font-extrabold text-2xl">Skill Barter Swap</span>
+                  ) : listing.transactionType === "EXCHANGE" ? (
+                    "Exchange Only"
+                  ) : (
+                    formatPrice(listing.price)
+                  )}
+                </div>
                 {listing.transactionType === "BOTH" && (
                   <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded">
                     Open to trades
+                  </span>
+                )}
+                {listing.transactionType === "DONATION" && (
+                  <span className="text-xs text-emerald-800 font-semibold bg-emerald-100 px-2 py-0.5 rounded">
+                    Senior Community Donation
                   </span>
                 )}
               </div>

@@ -8,14 +8,14 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-6.x-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![Database](https://img.shields.io/badge/Database-SQLite%20%26%20PostgreSQL-4479A1?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Vitest](https://img.shields.io/badge/Tests-24%2F24%20Passing-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-37%2F37%20Passing-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 <p align="center">
   <b>A production-grade, deployable B.Tech CSE Major Capstone Project built for university placements, engineering portfolio, and real-world campus trade.</b>
 </p>
 
-[Explore Catalog](http://localhost:3000/browse) • [Project Overview](#-1-project-overview) • [Supported Colleges](#-2-multi-college--greater-noida-hub) • [Key Features](#-3-key-features) • [Architecture](#-5-system-architecture) • [Quickstart Guide](#-7-local-development-setup) • [Demo Logins](#-6-pre-configured-demo-accounts)
+[Explore Catalog](http://localhost:3000/browse) • [Lost & Found](http://localhost:3000/lost-and-found) • [AI Valuation](http://localhost:3000/ai-price-estimator) • [Free Corner (₹0)](http://localhost:3000/browse?type=DONATION) • [Key Features](#-3-key-features) • [Architecture](#-6-system-architecture) • [Demo Logins](#-7-pre-configured-demo-accounts)
 
 </div>
 
@@ -39,7 +39,35 @@ Every semester, engineering and university students spend thousands of rupees on
 
 ---
 
-## 🏫 2. Multi-College & Greater Noida Campus Cluster
+## 🚀 2. Newly Added Flagship Innovations
+
+### 1. 🔍 Campus "Lost & Found" Tracker (खोया-पाया पोर्टल)
+College students regularly misplace ID cards, scientific calculators, metro cards, and project files in libraries, canteens, and labs. Traditional notice boards are ignored, and broadcasting room locations on unmoderated groups leads to fraudulent claims.
+CampusConnect implements a **3-Layer Secure Handshake Protocol**:
+* **Custody Tracking**: Finder declares where the item is kept (*“With Finder (meet at Student Canteen)”* or *“Handed to Central Library Helpdesk”*).
+* **Secret Identification Mark**: Finder creates a verification question (e.g., *“What sticker or marking is on the back battery lid?”*). Claimants submit confidential proof known only to the real owner.
+* **4-Digit Physical Handshake OTP**: When the finder approves the proof, the system issues a 4-digit code. During in-person handover, the claimant presents the OTP; the finder enters it to formally close and archive the record as **RESOLVED**.
+
+### 2. 🤖 AI Fair Price Suggester & Valuation Tool (AI प्राइस कैलकुलेटर)
+Prevents unreasonable pricing and eliminates tedious campus bargaining.
+* **Academic Depreciation Curve**: Factors in original MRP, wear condition (`NEW`, `LIKE_NEW`, `GOOD`, `FAIR`), semester age, and college exam cycle demand.
+* **Fast-Sell Probability Score**: Calculates probability of clearance within 48 hours.
+* **Junior Savings Benchmark**: Displays transparent percentage savings (40%–85% discount vs. retail bookshops).
+* **1-Click Form Transfer**: Instantly auto-fills calculated pricing into the marketplace listing creation form.
+
+### 3. 🎁 End-of-Semester "Free Giveaways / Donation Corner" (₹0 का सेक्शन)
+Designed for graduating seniors and hostel pass-outs donating drafters, lab aprons, sheets, and books to juniors.
+* Enforced **₹0 price validation** with distinctive emerald badges and dedicated filters.
+* Promotes circular economy, peer sustainability, and zero campus waste.
+
+### 4. 💡 "Skill & Academic Barter" (विद्या विनिमय / Service Swap)
+Recognizes that peer support extends beyond physical items:
+* Students can trade academic services (e.g., *“Python & Data Structures tutoring in exchange for Engineering Drawing sheets / AutoCAD assistance”*).
+* Completely non-monetary, cashless category with specialized barter badges.
+
+---
+
+## ⚡ 3. Key Features
 
 CampusConnect features built-in multi-tenant campus separation with automated domain verification for major colleges in the **Greater Noida Knowledge Park Cluster** and premier technical institutions:
 

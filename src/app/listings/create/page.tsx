@@ -5,8 +5,20 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { PlusCircle, Upload, X, AlertCircle, ShieldAlert, Sparkles, Image as ImageIcon, GraduationCap, Lock, Globe, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import {
+  PlusCircle,
+  Upload,
+  X,
+  AlertCircle,
+  ShieldAlert,
+  Sparkles,
+  GraduationCap,
+  Lock,
+  Globe,
+  CheckCircle2,
+} from "lucide-react";
+import { AiPriceEstimatorWidget } from "@/components/listings/AiPriceEstimatorWidget";
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -39,6 +51,24 @@ export default function CreateListingPage() {
         }
       })
       .catch((e) => console.error("Error fetching categories:", e));
+
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const title = sp.get("title");
+      const price = sp.get("price");
+      const condition = sp.get("condition");
+      const type = sp.get("type");
+
+      if (title || price || condition || type) {
+        setFormData((prev) => ({
+          ...prev,
+          ...(title ? { title } : {}),
+          ...(price ? { price } : {}),
+          ...(condition ? { condition } : {}),
+          ...(type ? { transactionType: type } : {}),
+        }));
+      }
+    }
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -100,8 +130,12 @@ export default function CreateListingPage() {
     if (formData.description.length < 10) newErrors.description = "Description must be at least 10 characters";
     if (images.length === 0) newErrors.images = "At least one product image is required";
 
-    const priceNum = formData.transactionType === "EXCHANGE" ? 0 : parseFloat(formData.price || "0");
-    if (formData.transactionType !== "EXCHANGE" && (isNaN(priceNum) || priceNum < 0)) {
+    const isZeroPrice =
+      formData.transactionType === "EXCHANGE" ||
+      formData.transactionType === "DONATION" ||
+      formData.transactionType === "SKILL_EXCHANGE";
+    const priceNum = isZeroPrice ? 0 : parseFloat(formData.price || "0");
+    if (!isZeroPrice && (isNaN(priceNum) || priceNum < 0)) {
       newErrors.price = "Valid price is required";
     }
 
@@ -316,12 +350,27 @@ export default function CreateListingPage() {
               <select
                 name="transactionType"
                 value={formData.transactionType}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData((prev) => ({
+                    ...prev,
+                    transactionType: val,
+                    price:
+                      val === "DONATION" || val === "EXCHANGE" || val === "SKILL_EXCHANGE"
+                        ? "0"
+                        : prev.price === "0"
+                        ? ""
+                        : prev.price,
+                  }));
+                  if (errors.price) setErrors((prev) => ({ ...prev, price: "" }));
+                }}
                 className="w-full px-3.5 py-2 text-sm rounded-lg border border-zinc-300 bg-white text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="SELL">For Sale Only</option>
                 <option value="EXCHANGE">Exchange Only</option>
                 <option value="BOTH">Sell or Exchange</option>
+                <option value="DONATION">🎁 Free Giveaway (₹0 Donation)</option>
+                <option value="SKILL_EXCHANGE">💡 Skill &amp; Academic Barter</option>
               </select>
             </div>
 
@@ -330,14 +379,37 @@ export default function CreateListingPage() {
               name="price"
               type="number"
               min={0}
-              placeholder="e.g. 500"
-              value={formData.price}
+              placeholder={formData.transactionType === "DONATION" ? "0" : "e.g. 500"}
+              value={formData.transactionType === "DONATION" ? "0" : formData.price}
               onChange={handleInputChange}
               error={errors.price}
-              disabled={formData.transactionType === "EXCHANGE"}
-              helperText={formData.transactionType === "EXCHANGE" ? "Not applicable for exchange-only" : ""}
+              disabled={
+                formData.transactionType === "EXCHANGE" ||
+                formData.transactionType === "DONATION" ||
+                formData.transactionType === "SKILL_EXCHANGE"
+              }
+              helperText={
+                formData.transactionType === "DONATION"
+                  ? "🎁 Free campus donation (₹0)"
+                  : formData.transactionType === "SKILL_EXCHANGE"
+                  ? "💡 Cashless skill exchange"
+                  : formData.transactionType === "EXCHANGE"
+                  ? "Item-for-item exchange"
+                  : ""
+              }
             />
           </div>
+
+          {/* AI Fair Price Suggester & Valuation Tool */}
+          <AiPriceEstimatorWidget
+            condition={formData.condition}
+            category={categories.find((c) => c.id === formData.categoryId)?.name || "books"}
+            transactionType={formData.transactionType}
+            onApplyPrice={(suggestedPrice) => {
+              setFormData((prev) => ({ ...prev, price: String(suggestedPrice) }));
+              if (errors.price) setErrors((prev) => ({ ...prev, price: "" }));
+            }}
+          />
 
           {/* Description */}
           <div className="space-y-1.5">
