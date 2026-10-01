@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GraduationCap, AlertCircle, KeyRound, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function LoginPage() {
 
     if (!email || !password) {
       setError("Please fill in both email and password");
+      showToast("Please fill in both email and password", "error");
       return;
     }
 
@@ -36,14 +38,19 @@ export default function LoginPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        setError(json.error || "Login failed");
+        const errorMsg = json.error || "Login failed";
+        setError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      showToast("Login successful! Welcome back.", "success");
       await refreshUser();
       router.push("/browse");
     } catch {
-      setError("Network error. Please try again.");
+      const errorMsg = "Network error. Please try again.";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsLoading(false);
     }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, use } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import { formatPrice, timeAgo } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -72,10 +73,10 @@ export default function ChatPage({ params }: ChatPageProps) {
         setMessages((prev) => [...prev, json.data]);
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to send message");
+        showToast(json.error || "Failed to send message", "error");
       }
     } catch {
-      alert("Failed to send message");
+      showToast("Failed to send message", "error");
     } finally {
       setIsSending(false);
     }

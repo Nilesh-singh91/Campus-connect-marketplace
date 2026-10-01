@@ -14,6 +14,7 @@ import {
   Layers,
   Search,
 } from "lucide-react";
+import { showToast } from "@/context/ToastContext";
 
 interface AdminClientProps {
   metrics: {
@@ -58,12 +59,13 @@ export const AdminClient: React.FC<AdminClientProps> = ({
         setUsers((prev) =>
           prev.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
         );
+        showToast(`User status updated to ${newStatus}`, "success");
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to update status");
+        showToast(json.error || "Failed to update status", "error");
       }
     } catch {
-      alert("Network error updating user status");
+      showToast("Network error updating user status", "error");
     } finally {
       setUpdatingId(null);
     }
@@ -81,12 +83,13 @@ export const AdminClient: React.FC<AdminClientProps> = ({
         setUsers((prev) =>
           prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
         );
+        showToast(`User role updated to ${newRole}`, "success");
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to update role");
+        showToast(json.error || "Failed to update role", "error");
       }
     } catch {
-      alert("Network error updating user role");
+      showToast("Network error updating user role", "error");
     } finally {
       setUpdatingId(null);
     }

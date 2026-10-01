@@ -6,6 +6,7 @@ import { formatPrice, timeAgo } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Heart, Repeat, UserCheck, GraduationCap, AlertCircle, Lock, Globe } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 
 export interface ListingCardProps {
   id: string;
@@ -48,6 +49,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
+      showToast("Please log in to add favorites", "info");
       window.location.href = "/login";
       return;
     }
@@ -62,9 +64,15 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       if (res.ok) {
         const json = await res.json();
         setIsFavorited(json.data.favorited);
+        if (json.data.favorited) {
+          showToast("Added to wishlist", "success");
+        } else {
+          showToast("Removed from wishlist", "info");
+        }
       }
     } catch (e) {
       console.error("Favorite toggle error:", e);
+      showToast("Failed to update wishlist", "error");
     } finally {
       setIsFavLoading(false);
     }

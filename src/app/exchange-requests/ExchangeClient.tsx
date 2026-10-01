@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Repeat, Check, X, Ban, ArrowRight, UserCheck, PackageOpen } from "lucide-react";
+import { showToast } from "@/context/ToastContext";
 
 interface ExchangeClientProps {
   initialExchanges: any[];
@@ -35,12 +36,13 @@ export const ExchangeClient: React.FC<ExchangeClientProps> = ({ initialExchanges
         setExchanges((prev) =>
           prev.map((e) => (e.id === id ? { ...e, status: newStatus } : e))
         );
+        showToast(`Exchange request ${newStatus.toLowerCase()} successfully`, "success");
       } else {
         const json = await res.json();
-        alert(json.error || "Failed to update status");
+        showToast(json.error || "Failed to update status", "error");
       }
     } catch {
-      alert("Network error updating exchange");
+      showToast("Network error updating exchange", "error");
     } finally {
       setLoadingId(null);
     }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GraduationCap, ShieldCheck, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,6 +60,7 @@ export default function RegisterPage() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      showToast("Please correct the form errors", "error");
       return;
     }
 
@@ -81,7 +83,9 @@ export default function RegisterPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        setServerError(json.error || "Registration failed");
+        const errorMsg = json.error || "Registration failed";
+        setServerError(errorMsg);
+        showToast(errorMsg, "error");
         if (json.details) {
           const fieldErrs: Record<string, string> = {};
           for (const k in json.details) {
@@ -92,11 +96,14 @@ export default function RegisterPage() {
         return;
       }
 
+      showToast("Registration successful! Verify your college account.", "success");
       await refreshUser();
       // Redirect to verification screen with generated token pre-loaded for convenience
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&code=${json.data?.verificationCode || ""}`);
     } catch {
-      setServerError("Network error. Please try again.");
+      const errorMsg = "Network error. Please try again.";
+      setServerError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsLoading(false);
     }

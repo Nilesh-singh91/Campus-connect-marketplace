@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ShieldCheck, CheckCircle2, AlertCircle, User, Lock } from "lucide-react";
@@ -70,17 +71,23 @@ export default function SettingsPage() {
 
       const json = await res.json();
       if (!res.ok) {
+        const errorMsg = json.error || "Failed to update profile";
         setStatus("error");
-        setMessage(json.error || "Failed to update profile");
+        setMessage(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      const successMsg = "Student profile updated successfully";
       setStatus("success");
-      setMessage("Student profile updated successfully");
+      setMessage(successMsg);
+      showToast(successMsg, "success");
       await refreshUser();
     } catch {
+      const errorMsg = "Network error saving profile";
       setStatus("error");
-      setMessage("Network error saving profile");
+      setMessage(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmitting(false);
     }

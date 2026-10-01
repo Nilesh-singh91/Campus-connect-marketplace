@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
@@ -79,6 +80,11 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
         const json = await res.json();
         setFavorited(json.data.favorited);
         setFavCount((prev) => (json.data.favorited ? prev + 1 : Math.max(0, prev - 1)));
+        if (json.data.favorited) {
+          showToast("Added to wishlist", "success");
+        } else {
+          showToast("Removed from wishlist", "info");
+        }
       }
     } finally {
       setIsFavLoading(false);
@@ -147,17 +153,22 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
 
       const json = await res.json();
       if (!res.ok) {
-        setExchangeError(json.error || "Failed to submit exchange proposal");
+        const errorMsg = json.error || "Failed to submit exchange proposal";
+        setExchangeError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      showToast("Exchange proposal sent successfully!", "success");
       setExchangeSuccess(true);
       setTimeout(() => {
         setIsExchangeModalOpen(false);
         router.push("/exchange-requests");
       }, 1500);
     } catch {
-      setExchangeError("Network error. Please try again.");
+      const errorMsg = "Network error. Please try again.";
+      setExchangeError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmittingExchange(false);
     }
@@ -173,10 +184,14 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
       });
       if (res.ok) {
         setCurrentStatus(newStatus);
+        showToast(`Item marked as ${newStatus}`, "success");
         router.refresh();
+      } else {
+        showToast("Failed to update status", "error");
       }
     } catch (e) {
       console.error("Status update error:", e);
+      showToast("Network error updating status", "error");
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -192,10 +207,14 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
       });
       if (res.ok) {
         setIsCampusOnly(newValue);
+        showToast(newValue ? "Restricted to your campus" : "Visible across all campuses", "info");
         router.refresh();
+      } else {
+        showToast("Failed to update campus restriction", "error");
       }
     } catch (e) {
       console.error("Campus restriction update error:", e);
+      showToast("Network error updating restriction", "error");
     } finally {
       setIsUpdatingCampus(false);
     }
@@ -208,10 +227,14 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
         method: "DELETE",
       });
       if (res.ok) {
+        showToast("Item deleted successfully", "success");
         router.push("/my-listings");
+      } else {
+        showToast("Failed to delete item", "error");
       }
     } catch (e) {
       console.error("Delete error:", e);
+      showToast("Network error deleting item", "error");
     } finally {
       setIsDeleting(false);
     }

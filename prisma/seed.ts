@@ -1408,139 +1408,282 @@ async function main() {
   console.log(`✓ Seeded ${allListings.length} rich demo products across all ${domains.length} college campuses!`);
 
   // 5. Seed Lost & Found Items
-  const existingLf = await prisma.lostAndFoundItem.count();
-  if (existingLf === 0) {
-    await prisma.lostAndFoundItem.create({
-      data: {
-        type: "FOUND",
-        title: "Casio fx-991EX Scientific Calculator",
-        description: "Found on the 2nd row bench after CSE Data Structures lab practical. Has a blue carbon vinyl wrap on the slide cover.",
-        category: "CALCULATOR",
-        location: "Computer Lab 3, 2nd Floor, Academic Block A",
-        custodyLocation: "With Student Finder (Meet at LIET Student Canteen)",
-        secretQuestion: "What is written in black marker on the battery compartment lid?",
-        imageUrl: "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80",
-        status: "OPEN",
-        userId: amanLiet.id,
-        collegeDomainId: lietDomainId,
-      },
-    });
+  const lfItems = [
+    {
+      type: "FOUND",
+      title: "Casio fx-991EX Scientific Calculator",
+      description: "Found on the 2nd row bench after CSE Data Structures lab practical. Has a blue carbon vinyl wrap on the slide cover.",
+      category: "CALCULATOR",
+      location: "Computer Lab 3, 2nd Floor, Academic Block A",
+      custodyLocation: "With Student Finder (Meet at LIET Student Canteen)",
+      secretQuestion: "What is written in black marker on the battery compartment lid?",
+      imageUrl: "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: amanLiet.id,
+      collegeDomainId: lietDomainId,
+    },
+    {
+      type: "FOUND",
+      title: "College ID Card & Delhi Metro Smart Card",
+      description: "Found near table 14 in the 1st floor reading hall. Name and student ID are clearly printed.",
+      category: "ID_CARD",
+      location: "Central Library, 1st Floor Reading Hall",
+      custodyLocation: "Deposited at Library Reception Helpdesk",
+      secretQuestion: "Confirm your full name, father's name, and 10-digit roll number.",
+      imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: rahulGniot.id,
+      collegeDomainId: gniotDomainId,
+    },
+    {
+      type: "LOST",
+      title: "Matte Black HP 65W USB-C Laptop Charger",
+      description: "Left behind in the Seminar Hall after the afternoon cloud computing workshop. Charger has a small scratch near the two-pin plug.",
+      category: "ELECTRONICS",
+      location: "Main Auditorium / Seminar Hall",
+      custodyLocation: "Lost by student",
+      secretQuestion: "Serial number last 4 digits or brand model code",
+      imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: amanLiet.id,
+      collegeDomainId: lietDomainId,
+    },
+    {
+      type: "FOUND",
+      title: "Noise ColorFit Pulse Smart Watch with Charcoal Black Strap",
+      description: "Found on table 6 in the student cafeteria food court during 1:30 PM lunch break. Screen has a tempered glass protector.",
+      category: "ELECTRONICS",
+      location: "Student Cafeteria & Food Court, Ground Floor",
+      custodyLocation: "With Finder (Meet outside Canteen entrance)",
+      secretQuestion: "What wallpaper/watch face is set and what is the strap buckle type?",
+      imageUrl: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: amanLiet.id,
+      collegeDomainId: lietDomainId,
+    },
+    {
+      type: "FOUND",
+      title: "Parker Vector Matte Black Fountain Pen with Stainless Steel Nib",
+      description: "Found tucked between pages of a reference book on Desk 8 in the Central Library 2nd floor reading hall.",
+      category: "OTHER",
+      location: "Central Library, 2nd Floor Quiet Study Section",
+      custodyLocation: "Deposited with Library Circulation Desk",
+      secretQuestion: "What color ink is inside the converter and is there an engraved initial?",
+      imageUrl: "https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: rahulGniot.id,
+      collegeDomainId: gniotDomainId,
+    },
+    {
+      type: "LOST",
+      title: "boAt Airdopes 141 True Wireless Earbuds (Gunmetal Black Case)",
+      description: "Accidentally left in the indoor badminton sports complex locker room bench after evening sports practice.",
+      category: "ELECTRONICS",
+      location: "Indoor Sports Complex & Badminton Arena",
+      custodyLocation: "Lost by student",
+      secretQuestion: "Has a small yellow Pikachu sticker on the bottom of the charging case",
+      imageUrl: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: amanLiet.id,
+      collegeDomainId: lietDomainId,
+    },
+    {
+      type: "LOST",
+      title: "College Main Gate Entry Pass & Hostel Mess ID Card",
+      description: "Lost somewhere along the covered walkway between Block B and the Admin Office around 11:00 AM.",
+      category: "ID_CARD",
+      location: "Admin Block Corridor & Exam Cell Walkway",
+      custodyLocation: "Lost by student",
+      secretQuestion: "Confirm your student roll number and blood group listed on the reverse side",
+      imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+      status: "OPEN",
+      userId: rahulGniot.id,
+      collegeDomainId: gniotDomainId,
+    },
+  ];
 
-    await prisma.lostAndFoundItem.create({
-      data: {
-        type: "FOUND",
-        title: "College ID Card & Delhi Metro Smart Card",
-        description: "Found near table 14 in the 1st floor reading hall. Name and student ID are clearly printed.",
-        category: "ID_CARD",
-        location: "Central Library, 1st Floor Reading Hall",
-        custodyLocation: "Deposited at Library Reception Helpdesk",
-        secretQuestion: "Confirm your full name, father's name, and 10-digit roll number.",
-        imageUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
-        status: "OPEN",
-        userId: rahulGniot.id,
-        collegeDomainId: gniotDomainId,
-      },
+  for (const item of lfItems) {
+    const existing = await prisma.lostAndFoundItem.findFirst({
+      where: { title: item.title },
     });
-
-    await prisma.lostAndFoundItem.create({
-      data: {
-        type: "LOST",
-        title: "Matte Black HP 65W USB-C Laptop Charger",
-        description: "Left behind in the Seminar Hall after the afternoon cloud computing workshop. Charger has a small scratch near the two-pin plug.",
-        category: "ELECTRONICS",
-        location: "Main Auditorium / Seminar Hall",
-        custodyLocation: "Lost by student",
-        secretQuestion: "Serial number last 4 digits or brand model code",
-        imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
-        status: "OPEN",
-        userId: amanLiet.id,
-        collegeDomainId: lietDomainId,
-      },
-    });
-    console.log("✓ Seeded demo Lost & Found items");
+    if (!existing) {
+      await prisma.lostAndFoundItem.create({ data: item });
+    }
   }
+  console.log(`✓ Seeded ${lfItems.length} Campus Lost & Found items`);
 
   // 6. Seed Free Giveaways (₹0) and Skill Barter Listings
-  const freeGiveawaysExist = await prisma.listing.count({
-    where: { transactionType: "DONATION" },
-  });
-  if (freeGiveawaysExist === 0) {
-    const toolsCat = categoryMap.get("engineering-tools")!;
-    const notesCat = categoryMap.get("notes-materials")!;
+  const barterAndDonationListings = [
+    {
+      title: "🎁 Free Senior Giveaway: Omega Mini Drafter & Board Clips",
+      description: "Graduating senior giveaway! Complete working mini drafter with clamp and 4 board clips. Passing down free to 1st/2nd year juniors to save textbook and stationery expenses.",
+      price: 0,
+      condition: ItemCondition.GOOD,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: engineeringCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "🎁 Free Senior Donation: 1st Year Chemistry & Workshop Cotton Apron",
+      description: "100% white cotton lab apron (Size M) in clean, washed condition. Free donation for incoming batch students.",
+      price: 0,
+      condition: ItemCondition.GOOD,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: rahulGniot.id,
+      categoryId: engineeringCat,
+      collegeDomainId: gniotDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "🎁 Free Senior Giveaway: Engineering Graphics Drawing Board with T-Square & Clips",
+      description: "Graduating 4th year senior donating standard Imperial size wooden drawing board with T-Square, set squares, and drafting clips. Free for 1st year B.Tech freshers!",
+      price: 0,
+      condition: ItemCondition.GOOD,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: engineeringCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "🎁 Free Semester Donation: GATE CSE 10-Year Topicwise Solved Papers & Formula Handbook",
+      description: "Made Gate qualification this year, passing down my printed Made Easy & Ace Academy GATE CSE test series booklets and formula handbook to juniors free of cost.",
+      price: 0,
+      condition: ItemCondition.LIKE_NEW,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: rahulGniot.id,
+      categoryId: notesCat,
+      collegeDomainId: gniotDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "🎁 Free Hostel Giveaway: Electronic Breadboard with 65 Jumper Wires & Sensor Pack",
+      description: "Clean solderless breadboard with male-to-male jumpers, ultrasonic sensor, and LEDs from our IoT mini project. Free for students preparing for hardware lab.",
+      price: 0,
+      condition: ItemCondition.GOOD,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: electronicsCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "🎁 Free Hostel Essential: Flexible USB-Rechargeable Eye-Care LED Study Desk Lamp",
+      description: "3 brightness levels with touch control. Working perfectly on battery or micro-USB. Free donation for any hostel student studying late nights.",
+      price: 0,
+      condition: ItemCondition.GOOD,
+      transactionType: TransactionType.DONATION,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: rahulGniot.id,
+      categoryId: hostelCat,
+      collegeDomainId: gniotDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "💡 Skill Barter: DSA & LeetCode Python Tutoring in Exchange for ED Sheets",
+      description: "3rd year CSE student offering 1-on-1 tutoring sessions on Data Structures, Algorithms, and Python coding in exchange for assistance with Engineering Drawing assignments or mechanical workshop practice.",
+      price: 0,
+      condition: ItemCondition.NEW,
+      transactionType: TransactionType.SKILL_EXCHANGE,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: notesCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "💡 Skill Barter: Web Development (React/Tailwind) Swap for DBMS Exam Notes",
+      description: "Offering hands-on guidance to build your college project portfolio website using React & Next.js. In return, looking for comprehensive handwritten notes for Database Management Systems (AKTU syllabus).",
+      price: 0,
+      condition: ItemCondition.NEW,
+      transactionType: TransactionType.SKILL_EXCHANGE,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: rahulGniot.id,
+      categoryId: notesCat,
+      collegeDomainId: gniotDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "💡 Skill Barter: SolidWorks 3D Modeling & CAD Drafting in Exchange for Python Prep",
+      description: "Mechanical 3rd year offering comprehensive 1-on-1 sessions on 3D CAD modeling, SolidWorks assembly, and engineering tolerances. Looking for guidance on Python basics and DSA problem solving.",
+      price: 0,
+      condition: ItemCondition.NEW,
+      transactionType: TransactionType.SKILL_EXCHANGE,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: engineeringCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "💡 Skill Barter: Aptitude & Quantitative Placement Prep in Exchange for Frontend Web Dev Help",
+      description: "Cracked AMCAT & eLitmus quantitative sections with 99+ percentile. Willing to coach you through quantitative aptitude, speed math, and logical puzzles in exchange for helping me build a Next.js resume website.",
+      price: 0,
+      condition: ItemCondition.NEW,
+      transactionType: TransactionType.SKILL_EXCHANGE,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: rahulGniot.id,
+      categoryId: notesCat,
+      collegeDomainId: gniotDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      title: "💡 Skill Barter: Java Spring Boot & Backend Microservices Tutoring for ML & AI Notes",
+      description: "Final year student with 6-month backend internship experience. Can teach you REST APIs, Spring Boot, Hibernate, and PostgreSQL from scratch. Looking for well-structured notes on Machine Learning and Neural Networks.",
+      price: 0,
+      condition: ItemCondition.NEW,
+      transactionType: TransactionType.SKILL_EXCHANGE,
+      status: ListingStatus.AVAILABLE,
+      campusOnly: true,
+      userId: amanLiet.id,
+      categoryId: notesCat,
+      collegeDomainId: lietDomainId,
+      imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    },
+  ];
 
-    await prisma.listing.create({
-      data: {
-        title: "🎁 Free Senior Giveaway: Omega Mini Drafter & Board Clips",
-        description: "Graduating senior giveaway! Complete working mini drafter with clamp and 4 board clips. Passing down free to 1st/2nd year juniors to save textbook and stationery expenses.",
-        price: 0,
-        condition: ItemCondition.GOOD,
-        transactionType: TransactionType.DONATION,
-        status: ListingStatus.AVAILABLE,
-        campusOnly: true,
-        userId: amanLiet.id,
-        categoryId: toolsCat,
-        collegeDomainId: lietDomainId,
-        images: {
-          create: [{ url: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80", displayOrder: 0 }],
-        },
-      },
+  for (const item of barterAndDonationListings) {
+    const existing = await prisma.listing.findFirst({
+      where: { title: item.title },
     });
-
-    await prisma.listing.create({
-      data: {
-        title: "🎁 Free Senior Donation: 1st Year Chemistry & Workshop Cotton Apron",
-        description: "100% white cotton lab apron (Size M) in clean, washed condition. Free donation for incoming batch students.",
-        price: 0,
-        condition: ItemCondition.GOOD,
-        transactionType: TransactionType.DONATION,
-        status: ListingStatus.AVAILABLE,
-        campusOnly: true,
-        userId: rahulGniot.id,
-        categoryId: toolsCat,
-        collegeDomainId: gniotDomainId,
-        images: {
-          create: [{ url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80", displayOrder: 0 }],
+    if (!existing) {
+      await prisma.listing.create({
+        data: {
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          condition: item.condition,
+          transactionType: item.transactionType,
+          status: item.status,
+          campusOnly: item.campusOnly,
+          userId: item.userId,
+          categoryId: item.categoryId,
+          collegeDomainId: item.collegeDomainId,
+          images: {
+            create: [{ url: item.imageUrl, displayOrder: 0 }],
+          },
         },
-      },
-    });
-
-    await prisma.listing.create({
-      data: {
-        title: "💡 Skill Barter: DSA & LeetCode Python Tutoring in Exchange for ED Sheets",
-        description: "3rd year CSE student offering 1-on-1 tutoring sessions on Data Structures, Algorithms, and Python coding in exchange for assistance with Engineering Drawing assignments or mechanical workshop practice.",
-        price: 0,
-        condition: ItemCondition.NEW,
-        transactionType: TransactionType.SKILL_EXCHANGE,
-        status: ListingStatus.AVAILABLE,
-        campusOnly: true,
-        userId: amanLiet.id,
-        categoryId: notesCat,
-        collegeDomainId: lietDomainId,
-        images: {
-          create: [{ url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80", displayOrder: 0 }],
-        },
-      },
-    });
-
-    await prisma.listing.create({
-      data: {
-        title: "💡 Skill Barter: Web Development (React/Tailwind) Swap for DBMS Exam Notes",
-        description: "Offering hands-on guidance to build your college project portfolio website using React & Next.js. In return, looking for comprehensive handwritten notes for Database Management Systems (AKTU syllabus).",
-        price: 0,
-        condition: ItemCondition.NEW,
-        transactionType: TransactionType.SKILL_EXCHANGE,
-        status: ListingStatus.AVAILABLE,
-        campusOnly: true,
-        userId: rahulGniot.id,
-        categoryId: notesCat,
-        collegeDomainId: gniotDomainId,
-        images: {
-          create: [{ url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80", displayOrder: 0 }],
-        },
-      },
-    });
-    console.log("✓ Seeded demo Free Giveaways (₹0) and Skill Barter listings");
+      });
+    }
   }
+  console.log(`✓ Seeded ${barterAndDonationListings.length} Free Giveaways (₹0) and Skill Barter listings`);
 
   console.log("Database seeding completed successfully!");
 }

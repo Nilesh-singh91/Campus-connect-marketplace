@@ -16,6 +16,7 @@ import {
   MessageSquare,
   FileText,
 } from "lucide-react";
+import { showToast } from "@/context/ToastContext";
 
 interface ModeratorClientProps {
   initialReports: any[];
@@ -52,13 +53,14 @@ export const ModeratorClient: React.FC<ModeratorClientProps> = ({ initialReports
         setReports((prev) =>
           prev.map((r) => (r.id === selectedReport.id ? json.data.report : r))
         );
+        showToast("Moderation action executed successfully", "success");
         setSelectedReport(null);
         setInternalNotes("");
       } else {
-        alert(json.error || "Failed to execute moderation action");
+        showToast(json.error || "Failed to execute moderation action", "error");
       }
     } catch {
-      alert("Network error updating report");
+      showToast("Network error updating report", "error");
     } finally {
       setIsSubmitting(false);
     }

@@ -26,6 +26,7 @@ import {
   Building,
 } from "lucide-react";
 import Link from "next/link";
+import { showToast } from "@/context/ToastContext";
 
 interface LostFoundItem {
   id: string;
@@ -175,7 +176,7 @@ export default function LostAndFoundPage() {
   const handleReportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("Please log in to report an item.");
+      showToast("Please log in to report an item.", "info");
       return;
     }
 
@@ -191,10 +192,13 @@ export default function LostAndFoundPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        setReportError(json.error || "Failed to report item");
+        const errorMsg = json.error || "Failed to report item";
+        setReportError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      showToast("Item reported to campus Lost & Found!", "success");
       setIsReportModalOpen(false);
       setReportForm({
         type: "FOUND",
@@ -208,7 +212,9 @@ export default function LostAndFoundPage() {
       });
       fetchItems();
     } catch {
-      setReportError("Network error submitting report");
+      const errorMsg = "Network error submitting report";
+      setReportError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmittingReport(false);
     }
@@ -231,10 +237,13 @@ export default function LostAndFoundPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        setClaimError(json.error || "Failed to submit claim");
+        const errorMsg = json.error || "Failed to submit claim";
+        setClaimError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      showToast("Claim submitted! The finder has been notified.", "success");
       setClaimSuccess("Claim submitted! The finder has been notified to verify your proof.");
       setTimeout(() => {
         setIsClaimModalOpen(false);
@@ -243,7 +252,9 @@ export default function LostAndFoundPage() {
         fetchItems();
       }, 2000);
     } catch {
-      setClaimError("Network error submitting claim");
+      const errorMsg = "Network error submitting claim";
+      setClaimError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmittingClaim(false);
     }
@@ -265,9 +276,11 @@ export default function LostAndFoundPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        alert(json.error || "Failed to update claim");
+        showToast(json.error || "Failed to update claim", "error");
         return;
       }
+
+      showToast("Claim status updated successfully", "success");
 
       // Refresh detailed item
       const itemRes = await fetch(`/api/lost-and-found/${selectedItem.id}`);
@@ -277,7 +290,7 @@ export default function LostAndFoundPage() {
       }
       fetchItems();
     } catch {
-      alert("Network error processing claim");
+      showToast("Network error processing claim", "error");
     } finally {
       setIsResolving((prev) => ({ ...prev, [claimId]: false }));
     }
@@ -292,7 +305,7 @@ export default function LostAndFoundPage() {
         setIsManageClaimsModalOpen(true);
       }
     } catch {
-      alert("Failed to load claims");
+      showToast("Failed to load claims", "error");
     }
   };
 

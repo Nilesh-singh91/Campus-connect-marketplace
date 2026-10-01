@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AlertCircle, ArrowLeft, CheckCircle2, Lock, Globe } from "lucide-react";
@@ -89,16 +90,21 @@ export default function EditListingPage({ params }: EditListingPageProps) {
 
       const json = await res.json();
       if (!res.ok) {
-        setServerError(json.error || "Failed to update listing");
+        const errorMsg = json.error || "Failed to update listing";
+        setServerError(errorMsg);
+        showToast(errorMsg, "error");
         return;
       }
 
+      showToast("Item updated successfully", "success");
       setSuccess(true);
       setTimeout(() => {
         router.push(`/listings/${id}`);
       }, 1000);
     } catch {
-      setServerError("Network error updating listing");
+      const errorMsg = "Network error updating listing";
+      setServerError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
       setIsSubmitting(false);
     }

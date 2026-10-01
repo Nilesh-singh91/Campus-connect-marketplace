@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import Link from "next/link";
@@ -141,6 +142,7 @@ export default function CreateListingPage() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      showToast("Please fill in all required fields", "error");
       return;
     }
 
@@ -172,16 +174,22 @@ export default function CreateListingPage() {
             errMsgs.push(msg);
           }
           setErrors(fieldErrs);
-          setServerError(errMsgs.length > 0 ? errMsgs.join(". ") : (json.error || "Validation error"));
+          const errorMsg = errMsgs.length > 0 ? errMsgs.join(". ") : (json.error || "Validation error");
+          setServerError(errorMsg);
+          showToast(errorMsg, "error");
         } else {
-          setServerError(json.error || "Failed to create listing");
+          const errorMsg = json.error || "Failed to create listing";
+          setServerError(errorMsg);
+          showToast(errorMsg, "error");
         }
         return;
       }
 
+      showToast("Item added successfully!", "success");
       router.push(`/listings/${json.data.id}`);
     } catch {
       setServerError("Network error creating listing");
+      showToast("Network error creating listing", "error");
     } finally {
       setIsSubmitting(false);
     }

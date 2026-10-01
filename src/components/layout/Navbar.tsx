@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { showToast } from "@/context/ToastContext";
 import {
   GraduationCap,
   PlusCircle,
@@ -26,10 +27,32 @@ import { Button } from "@/components/ui/Button";
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentType = searchParams ? searchParams.get("type") : null;
   const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Exactly one item active at a time based on current page / query route
+  const getActiveItem = (): "browse" | "lost-found" | "free-corner" | "skill-swap" | "ai-valuation" | null => {
+    if (pathname.startsWith("/lost-and-found")) {
+      return "lost-found";
+    }
+    if (pathname.startsWith("/ai-price-estimator")) {
+      return "ai-valuation";
+    }
+    if (pathname === "/browse") {
+      if (currentType === "DONATION") return "free-corner";
+      if (currentType === "SKILL_EXCHANGE") return "skill-swap";
+      if (!currentType || currentType === "SELL" || currentType === "ALL") return "browse";
+      return "browse";
+    }
+    return null;
+  };
+
+  const activeItem = getActiveItem();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,12 +84,23 @@ export const Navbar: React.FC = () => {
 
             {/* Main Links */}
             <div className="hidden md:flex items-center gap-0.5 text-xs lg:text-sm font-medium text-zinc-600">
-              <Link href="/browse" className="px-2.5 py-1.5 rounded-lg hover:text-indigo-600 hover:bg-zinc-50 transition-colors">
+              <Link
+                href="/browse"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors duration-200 ${
+                  activeItem === "browse"
+                    ? "bg-zinc-100"
+                    : "hover:text-indigo-600 hover:bg-zinc-50"
+                }`}
+              >
                 Browse
               </Link>
               <Link
                 href="/lost-and-found"
-                className="px-2.5 py-1.5 rounded-lg hover:text-indigo-600 hover:bg-zinc-50 transition-colors flex items-center gap-1 text-zinc-800"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-1 text-zinc-800 ${
+                  activeItem === "lost-found"
+                    ? "bg-zinc-100"
+                    : "hover:text-indigo-600 hover:bg-zinc-50"
+                }`}
               >
                 <span>Lost &amp; Found</span>
                 <span className="text-[9px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-700 rounded-full animate-pulse">
@@ -75,20 +109,32 @@ export const Navbar: React.FC = () => {
               </Link>
               <Link
                 href="/browse?type=DONATION"
-                className="px-2.5 py-1.5 rounded-lg hover:text-emerald-700 hover:bg-emerald-50 transition-colors flex items-center gap-1 text-emerald-800"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-1 text-emerald-800 ${
+                  activeItem === "free-corner"
+                    ? "bg-zinc-100"
+                    : "hover:text-emerald-700 hover:bg-emerald-50"
+                }`}
               >
                 <Gift className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Free Corner (₹0)</span>
               </Link>
               <Link
                 href="/browse?type=SKILL_EXCHANGE"
-                className="px-2.5 py-1.5 rounded-lg hover:text-purple-700 hover:bg-purple-50 transition-colors flex items-center gap-1 text-purple-800"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-1 text-purple-800 ${
+                  activeItem === "skill-swap"
+                    ? "bg-zinc-100"
+                    : "hover:text-purple-700 hover:bg-purple-50"
+                }`}
               >
                 <span>Skill Swap</span>
               </Link>
               <Link
                 href="/ai-price-estimator"
-                className="px-2.5 py-1.5 rounded-lg hover:text-indigo-600 hover:bg-indigo-50 transition-colors flex items-center gap-1 text-indigo-700"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-1 text-indigo-700 ${
+                  activeItem === "ai-valuation"
+                    ? "bg-zinc-100"
+                    : "hover:text-indigo-600 hover:bg-indigo-50"
+                }`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                 <span>AI Valuation</span>
@@ -216,7 +262,11 @@ export const Navbar: React.FC = () => {
 
                       <div className="border-t border-zinc-100 mt-1">
                         <button
-                          onClick={logout}
+                          onClick={async () => {
+                            setUserMenuOpen(false);
+                            await logout();
+                            showToast("Logged out successfully", "info");
+                          }}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
                         >
                           <LogOut className="w-4 h-4" />
@@ -273,14 +323,18 @@ export const Navbar: React.FC = () => {
             <Link
               href="/browse"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-zinc-50"
+              className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${
+                activeItem === "browse" ? "bg-zinc-100" : "hover:bg-zinc-50"
+              }`}
             >
               Browse All Items
             </Link>
             <Link
               href="/lost-and-found"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-zinc-50 font-semibold text-zinc-900"
+              className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors duration-200 font-semibold text-zinc-900 ${
+                activeItem === "lost-found" ? "bg-zinc-100" : "hover:bg-zinc-50"
+              }`}
             >
               <span>🔍 Campus Lost &amp; Found</span>
               <span className="text-[10px] font-bold px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full">
@@ -290,7 +344,9 @@ export const Navbar: React.FC = () => {
             <Link
               href="/browse?type=DONATION"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-emerald-800 hover:bg-emerald-50 font-medium"
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200 text-emerald-800 font-medium ${
+                activeItem === "free-corner" ? "bg-zinc-100" : "hover:bg-emerald-50"
+              }`}
             >
               <Gift className="w-4 h-4 text-emerald-600" />
               <span>Free Giveaways Corner (₹0)</span>
@@ -298,14 +354,18 @@ export const Navbar: React.FC = () => {
             <Link
               href="/browse?type=SKILL_EXCHANGE"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg text-purple-800 hover:bg-purple-50 font-medium"
+              className={`block px-3 py-2 rounded-lg transition-colors duration-200 text-purple-800 font-medium ${
+                activeItem === "skill-swap" ? "bg-zinc-100" : "hover:bg-purple-50"
+              }`}
             >
               💡 Skill &amp; Academic Barter
             </Link>
             <Link
               href="/ai-price-estimator"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-indigo-700 hover:bg-indigo-50 font-medium"
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200 text-indigo-700 font-medium ${
+                activeItem === "ai-valuation" ? "bg-zinc-100" : "hover:bg-indigo-50"
+              }`}
             >
               <Sparkles className="w-4 h-4 text-indigo-600" />
               <span>AI Price Estimator &amp; Valuation</span>
@@ -364,9 +424,10 @@ export const Navbar: React.FC = () => {
                 </Link>
               )}
               <button
-                onClick={() => {
+                onClick={async () => {
                   setMobileMenuOpen(false);
-                  logout();
+                  await logout();
+                  showToast("Logged out successfully", "info");
                 }}
                 className="w-full text-left px-3 py-1.5 text-rose-600 font-medium"
               >
