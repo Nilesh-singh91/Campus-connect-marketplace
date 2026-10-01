@@ -67,33 +67,36 @@ const ToastItemComponent: React.FC<{
 
   const typeConfig: Record<
     ToastType,
-    { icon: React.ReactNode; border: string; iconBg: string }
+    { icon: React.ReactNode; container: string; text: string; closeBtn: string }
   > = {
     success: {
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />,
-      border: "border-emerald-200/90 shadow-emerald-500/5",
-      iconBg: "bg-emerald-50 text-emerald-700",
+      icon: <CheckCircle2 className="w-4 h-4 text-white shrink-0" />,
+      container: "bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-700/20",
+      text: "text-white font-medium",
+      closeBtn: "text-emerald-100 hover:text-white hover:bg-emerald-700/60",
     },
     error: {
-      icon: <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />,
-      border: "border-rose-200/90 shadow-rose-500/5",
-      iconBg: "bg-rose-50 text-rose-700",
+      icon: <AlertCircle className="w-4 h-4 text-white shrink-0" />,
+      container: "bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-700/20",
+      text: "text-white font-medium",
+      closeBtn: "text-rose-100 hover:text-white hover:bg-rose-700/60",
     },
     info: {
-      icon: <Info className="w-4 h-4 text-indigo-600 shrink-0" />,
-      border: "border-zinc-200/90 shadow-zinc-500/5",
-      iconBg: "bg-indigo-50 text-indigo-700",
+      icon: <Info className="w-4 h-4 text-white shrink-0" />,
+      container: "bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-700/20",
+      text: "text-white font-medium",
+      closeBtn: "text-indigo-100 hover:text-white hover:bg-indigo-700/60",
     },
   };
 
-  const config = typeConfig[item.type] || typeConfig.info;
+  const config = typeConfig[item.type] || typeConfig.success;
 
   return (
     <div
       role="status"
       aria-live="polite"
-      className={`pointer-events-auto flex items-start gap-2.5 p-3 sm:py-3 sm:px-3.5 rounded-xl border bg-white/95 backdrop-blur-md shadow-md text-zinc-900 transition-all duration-200 ${
-        config.border
+      className={`pointer-events-auto flex items-start gap-2.5 p-3 sm:py-3 sm:px-3.5 rounded-xl border backdrop-blur-md transition-all duration-200 ${
+        config.container
       } ${
         isDismissing
           ? "opacity-0 -translate-y-1.5 scale-95"
@@ -101,14 +104,14 @@ const ToastItemComponent: React.FC<{
       }`}
     >
       <div className="pt-0.5">{config.icon}</div>
-      <p className="flex-1 text-xs sm:text-sm font-medium leading-snug break-words text-zinc-800">
+      <p className={`flex-1 text-xs sm:text-sm leading-snug break-words ${config.text}`}>
         {item.message}
       </p>
       <button
         type="button"
         onClick={handleDismiss}
         aria-label="Dismiss notification"
-        className="text-zinc-400 hover:text-zinc-600 p-0.5 rounded-md hover:bg-zinc-100 transition-colors ml-1"
+        className={`p-0.5 rounded-md transition-colors ml-1 ${config.closeBtn}`}
       >
         <X className="w-3.5 h-3.5" />
       </button>

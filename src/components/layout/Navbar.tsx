@@ -265,7 +265,7 @@ export const Navbar: React.FC = () => {
                           onClick={async () => {
                             setUserMenuOpen(false);
                             await logout();
-                            showToast("Logged out successfully", "info");
+                            showToast("Logged out successfully", "success");
                           }}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
                         >
@@ -427,7 +427,7 @@ export const Navbar: React.FC = () => {
                 onClick={async () => {
                   setMobileMenuOpen(false);
                   await logout();
-                  showToast("Logged out successfully", "info");
+                  showToast("Logged out successfully", "success");
                 }}
                 className="w-full text-left px-3 py-1.5 text-rose-600 font-medium"
               >
